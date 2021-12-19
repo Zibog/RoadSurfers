@@ -4,6 +4,8 @@
 #include <SFML/OpenGL.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
 #include <vector>
@@ -42,6 +44,9 @@ struct GameObject {
     GLfloat shift[2];
 };
 
+// ID матрицы проекции
+GLint unifPerspective;
+
 
 sf::Texture textureData;
 std::vector <GameObject> gameObjects;
@@ -50,6 +55,18 @@ ShaderInformation shaderInformation;
 std::vector <GLuint> VBOArray;
 
 int numberOfSquares = 3;
+
+// Создает действительно трудночитаемую матрицу, но, тем не менее это стандартная матрица 4x4
+glm::mat4 projectionMatrix = glm::perspective(
+    glm::radians(90.0f), // Вертикальное поле зрения в радианах. Обычно между 90&deg; (очень широкое) и 30&deg; (узкое)
+    4.0f / 3.0f,       // Отношение сторон. Зависит от размеров вашего окна. Заметьте, что 4/3 == 800/600 == 1280/960
+    0.1f,              // Ближняя плоскость отсечения. Должна быть больше 0.
+    100.0f             // Дальняя плоскость отсечения.
+) * glm::lookAt(
+        glm::vec3(0.0f, -3.0f, 1.5f), // Камера находится в мировых координатах (4,3,3)
+        glm::vec3(0.0f, 0.0f, 0.0f), // И направлена в начало координат
+        glm::vec3(0.0f, 1.0f, 0.0f)  // "Голова" находится сверху
+);
 
 // Вершина
 struct Vertex
@@ -64,6 +81,10 @@ const char* VertexShaderSource = TO_STRING(
 
     uniform vec2 shift;
 
+    uniform struct Transform {
+        mat4 perspective;
+    } transform;
+
     in vec2 vertCoord;
     in vec2 texureCoord;
 
@@ -71,7 +92,7 @@ const char* VertexShaderSource = TO_STRING(
 
     void main() {
         tCoord = texureCoord;
-        gl_Position = vec4(vertCoord + shift, 0.0, 1.0);
+        gl_Position = transform.perspective * vec4(vertCoord + shift, 0.0, 1.0);
     }
 );
 
@@ -268,6 +289,13 @@ void InitShader() {
         std::cout << "could not bind uniform angle" << std::endl;
         return;
     }
+
+    unifPerspective = glGetUniformLocation(shaderInformation.shaderProgram, "transform.perspective");
+    if (unifPerspective == -1)
+    {
+        std::cout << "could not bind uniform transform.perspective" << std::endl;
+        return;
+    }
     checkOpenGLerror();
 }
 
@@ -299,6 +327,8 @@ void GameTick(int tick) {
 void Draw(GameObject gameObject) {
     glUseProgram(shaderInformation.shaderProgram);
     glUniform2fv(shaderInformation.unifShift, 1, gameObject.shift);
+
+    glUniformMatrix4fv(unifPerspective, 1, GL_FALSE, &projectionMatrix[0][0]);
 
     glActiveTexture(GL_TEXTURE0);
     sf::Texture::bind(&textureData);
