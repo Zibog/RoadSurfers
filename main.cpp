@@ -54,7 +54,7 @@ ShaderInformation shaderInformation;
 // Массив VBO что бы их потом удалить
 std::vector <GLuint> VBOArray;
 
-int numberOfSquares = 3;
+int numberOfSquares = 6;
 
 // Создает действительно трудночитаемую матрицу, но, тем не менее это стандартная матрица 4x4
 glm::mat4 projectionMatrix = glm::perspective(
@@ -63,7 +63,7 @@ glm::mat4 projectionMatrix = glm::perspective(
     0.1f,              // Ближняя плоскость отсечения. Должна быть больше 0.
     100.0f             // Дальняя плоскость отсечения.
 ) * glm::lookAt(
-        glm::vec3(0.0f, -3.0f, 1.5f), // Камера находится в мировых координатах (4,3,3)
+        glm::vec3(0.0f, -4.5f, 1.5f), // Камера находится в мировых координатах
         glm::vec3(0.0f, 0.0f, 0.0f), // И направлена в начало координат
         glm::vec3(0.0f, 1.0f, 0.0f)  // "Голова" находится сверху
 );
@@ -300,18 +300,19 @@ void InitShader() {
 }
 
 
-void InitTexture()
+void InitTexture(const char* filename)
 {
-    const char* filename = "image.jpg";
     if (!textureData.loadFromFile(filename))
     {
-        std::cout << "could not load texture" << std::endl;
+        std::cout << "could not load texture " << filename << std::endl;
     }
 }
 
 void Init() {
     InitShader();
-    InitTexture();
+    const char* metallica = "image.jpg";
+    const char* road = "road.png";
+    InitTexture(road);
     InitObjects();
 }
 
