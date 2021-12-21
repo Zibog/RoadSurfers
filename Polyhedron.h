@@ -12,26 +12,26 @@ using namespace std;
 
 struct Point3D
 {
-	GLfloat x;
-	GLfloat y;
-	GLfloat z;
-	GLfloat w;
+    GLfloat x;
+    GLfloat y;
+    GLfloat z;
+    GLfloat w;
 
-	Point3D(GLfloat X, GLfloat Y, GLfloat Z)
-	{
-		x = X;
-		y = Y;
-		z = Z;
-		w = 1.0;
-	}
+    Point3D(GLfloat X, GLfloat Y, GLfloat Z)
+    {
+        x = X;
+        y = Y;
+        z = Z;
+        w = 1.0;
+    }
 
-	Point3D()
-	{
-		x = 0.0;
-		y = 0.0;
-		z = 0.0;
-		w = 1.0;
-	}
+    Point3D()
+    {
+        x = 0.0;
+        y = 0.0;
+        z = 0.0;
+        w = 1.0;
+    }
 };
 
 struct PointUV
@@ -54,22 +54,22 @@ struct PointUV
 
 struct Triangle
 {
-	vector<Point3D> points;
+    vector<Point3D> points;
     vector<Point3D> normal;
     vector<PointUV> texture;
-	Triangle(vector<Point3D> pnts, vector<Point3D> nrml, vector<PointUV> txtr)
-	{
-		points = pnts;
-		normal = nrml;
+    Triangle(vector<Point3D> pnts, vector<Point3D> nrml, vector<PointUV> txtr)
+    {
+        points = pnts;
+        normal = nrml;
         texture = txtr;
-	}
+    }
 };
 
 struct Polyhedron
 {
-	vector<Point3D> vertices;
-	vector<Point3D> normals;
-	vector<Triangle> polygons;
+    vector<Point3D> vertices;
+    vector<Point3D> normals;
+    vector<Triangle> polygons;
     vector<PointUV> textures;
     vector<int> indexes;
 };
@@ -89,7 +89,7 @@ vector<string> parse(string line, string delimiter)
     return res;
 }
 
-void parseObjFile(Polyhedron & my_polyhedron, string path)
+void parseObjFile(Polyhedron& my_polyhedron, string path)
 {
     std::string line;
 
@@ -142,7 +142,7 @@ void parseObjFile(Polyhedron & my_polyhedron, string path)
                     points_textures.push_back(stoi(tmp[1]) - 1);
                     normal_index.push_back(stoi(tmp[2]) - 1);
                 }
-                
+
                 my_polyhedron.polygons.push_back(Triangle({ my_polyhedron.vertices[points_indeces[0]],
                     my_polyhedron.vertices[points_indeces[1]],
                     my_polyhedron.vertices[points_indeces[2]] },
@@ -154,40 +154,6 @@ void parseObjFile(Polyhedron & my_polyhedron, string path)
                     { my_polyhedron.textures[points_textures[0]],
                     my_polyhedron.textures[points_textures[1]],
                     my_polyhedron.textures[points_textures[2]], }));
-
-                
-                /*
-                std::string delimiter = " ";
-
-                vector<float> point;
-
-                size_t pos = 0;
-                std::string token;
-                vector<int> points_indeces;
-                int normal_index = 0;
-
-                while ((pos = line.find(delimiter)) != std::string::npos) {
-                    token = line.substr(0, pos);
-                    line.erase(0, pos + delimiter.length());
-                    std::cout << token << std::endl;
-
-                    std::string delimiter2 = "//";
-                    size_t pos2 = token.find(delimiter2);
-                    std::string token2 = token.substr(0, pos2);
-
-                    int ind = std::stoi(token2);
-
-                    points_indeces.push_back(ind);
-
-                    token.erase(0, pos2 + delimiter2.length());
-
-                    normal_index = std::stoi(token); // noraml
-                }*/
-
-                /*my_polyhedron.polygons.push_back(Triangle({ my_polyhedron.vertices[points_indeces[0] - 1],
-                    my_polyhedron.vertices[points_indeces[1] - 1],
-                    my_polyhedron.vertices[points_indeces[2] - 1] },
-                    Point3D(my_polyhedron.normals[normal_index - 1])));*/
             }
         }
     }
