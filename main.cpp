@@ -69,6 +69,7 @@ struct GameObject {
 
 float offset[3] = { 0.02, -2.74, 0.9 };
 float rotateGlob[3] = { -1.57, 0.0, 3.14 };
+float lightPos[3] = { 3.0f, 0.0f, 0.0f };
 GLboolean lightOnGlobal = true;
 
 sf::Texture textureData;
@@ -188,8 +189,10 @@ in vec3 lightp;
 in vec3 vnew;
 out vec4 color;
 
-const vec4 diffColor = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-const vec4 specColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+const vec4 diffColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
+const vec4 specColor = vec4(0.7f, 0.7f, 0.7f, 1.0f);
+//const vec4  diffColor = vec4(0.5, 0.0, 0.0, 1.0);
+//const vec4  specColor = vec4(0.7, 0.7, 0.0, 1.0);
 const float specPower = 30.0f;
 
 void main() {
@@ -200,8 +203,8 @@ void main() {
     vec4 diff = diffColor * max(dot(n2, l2), 0.0f);
     vec4 spec = specColor * pow(max(dot(l2, r), 0.0f), specPower);
 
-    color = texture(textureData, tCoord);
-    if (!unif_lightOn) { color = color * 0.4f + (diff + spec); }
+    color = texture(textureData, tCoord) + (diff + spec);
+    if (!unif_lightOn) { color = color * 0.4f; }
 }
 );
 
@@ -235,6 +238,17 @@ void incRotateAxis(int axis)//0x 1y 2z
 {
     rotateGlob[axis] -= 0.01;
     cout << rotateGlob[0] << " " << rotateGlob[1] << " " << rotateGlob[2] << endl;
+}
+
+void decLightPos(int axis)//0x 1y 2z
+{
+    lightPos[axis] += 0.1;
+    cout << lightPos[0] << " " << lightPos[1] << " " << lightPos[2] << endl;
+}
+void incLightPos(int axis)//0x 1y 2z
+{
+    lightPos[axis] -= 0.1;
+    cout << lightPos[0] << " " << lightPos[1] << " " << lightPos[2] << endl;
 }
 
 int main() {
@@ -273,6 +287,10 @@ int main() {
                 case (sf::Keyboard::Down):  decAxis(1); break;
                 case (sf::Keyboard::PageUp):  decAxis(2); break;
                 case (sf::Keyboard::PageDown):  incAxis(2); break;
+                case (sf::Keyboard::U): incLightPos(0); break;
+                 case (sf::Keyboard::J): decLightPos(0); break;
+                case (sf::Keyboard::H): incLightPos(1); break;
+                case (sf::Keyboard::K): decLightPos(1); break;
                 case (sf::Keyboard::L):  lightOnGlobal = !lightOnGlobal; break;
                 default: break;
                 }
@@ -753,6 +771,9 @@ void Draw(GameObject gameObject, int index = 0) {
     glUniform3fv(shaderInformation.unifBusRotate, 1, gameObject.rotateBus);
     glUniform3fv(shaderInformation.unifBusScale, 1, gameObject.scaleBus);
     glUniform3fv(shaderInformation.unifBusShift, 1, gameObject.shiftBus);
+    gameObject.lightPos[0] = lightPos[0];
+    gameObject.lightPos[1] = lightPos[1];
+    gameObject.lightPos[2] = lightPos[2];
     glUniform3fv(shaderInformation.Unif_lightPos, 1, gameObject.lightPos);
     glUniform3fv(shaderInformation.Unif_eyePos, 1, gameObject.eyePos);
     glUniform1i(shaderInformation.unif_lightOn, gameObject.lightOn);
