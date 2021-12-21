@@ -23,6 +23,8 @@ struct ShaderInformation {
     GLint attribVertex;
     // ID атрибута текстурных координат
     GLint attribTexture;
+    // ID атрибута нормали
+    GLint attribNormal;
     // ID юниформа текстуры
     GLint unifTexture;
     // ID юниформа сдвига
@@ -46,6 +48,8 @@ struct GameObject {
     GLuint vertexVBO;
     // ID буфера текстурных координат
     GLuint textureVBO;
+    // ID буфера нормалей
+    GLuint normalVBO;
     // ID текстуры
     GLuint textureHandle;
 
@@ -97,6 +101,7 @@ uniform vec3 eyePos;
 
 in vec3 vertCoord;
 in vec3 texureCoord;
+in vec3 normalCoord;
 
 out vec2 tCoord;
 
@@ -106,6 +111,7 @@ void main() {
     float z_angle = unifBusRotate.z;
     vec3 t = lightPos;
     vec3 t2 = lightPos * eyePos;
+    
     vec3 position = vertCoord * mat3(
         1, 0, 0,
         0, cos(x_angle), -sin(x_angle),
@@ -132,7 +138,8 @@ void main() {
         0, 0, 1, unifBusShift.z,
         0, 0, 0, 1
     );;
-    // TODO: remove lightPos;
+    // TODO: remove lightPos and eyePos;
+    gl_Position = vec4(normalCoord, 1.0f);
     gl_Position = transform.viewProjection * position2 * vec4(lightPos, 1.0f) * vec4(eyePos, 1.0f);
 }
 );
@@ -292,10 +299,13 @@ void InitObjects()
 {
     GLuint vertexVBO;
     GLuint textureVBO;
+    GLuint normalVBO;
     glGenBuffers(1, &vertexVBO);
     glGenBuffers(1, &textureVBO);
+    glGenBuffers(1, &normalVBO);
     VBOArray.push_back(vertexVBO);
     VBOArray.push_back(textureVBO);
+    VBOArray.push_back(normalVBO);
 
     // Объявляем вершины треугольника
     Vertex triangle[] = {
@@ -319,10 +329,22 @@ void InitObjects()
         { 0.0f, 1.0f  },
     };
 
+    Vertex normal[] = {
+        { -0.5f, -0.5f, 0.0f },
+        { +0.5f, -0.5f, 0.0f },
+        { +0.5f, +0.5f, 0.0f },
+
+        { +0.5f, +0.5f, 0.0f },
+        { -0.5f, +0.5f, 0.0f },
+        { -0.5f, -0.5f, 0.0f },
+    };
+
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(texture), texture, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(normal), normal, GL_STATIC_DRAW);
 
     checkOpenGLerror();
 
@@ -339,6 +361,7 @@ void InitObjects()
                 6,  // количество вершин в каждом буфере
                 vertexVBO,
                 textureVBO,
+                normalVBO,
                 textureData.getNativeHandle(), {0, 0} });
 
         textureDataVector.push_back(textureData);
@@ -387,6 +410,14 @@ void InitShader() {
     if (shaderInformation.attribTexture == -1)
     {
         std::cout << "could not bind attrib texureCoord" << std::endl;
+        return;
+    }
+
+    shaderInformation.attribNormal =
+        glGetAttribLocation(shaderInformation.shaderProgram, "normalCoord");
+    if (shaderInformation.attribNormal == -1)
+    {
+        std::cout << "could not bind attrib normalCoord" << std::endl;
         return;
     }
 
@@ -477,10 +508,13 @@ void InitBus()
     parseObjFile(pol, "model/bus2.obj");
     GLuint vertexVBO;
     GLuint textureVBO;
+    GLuint normalVBO;
     glGenBuffers(1, &vertexVBO);
     glGenBuffers(1, &textureVBO);
+    glGenBuffers(1, &normalVBO);
     VBOArray.push_back(vertexVBO);
     VBOArray.push_back(textureVBO);
+    VBOArray.push_back(normalVBO);
 
     vector<float> busCenter;
     busCenter.push_back(1.0);
@@ -513,10 +547,18 @@ void InitBus()
         pointsTexture[i] = { vv[i][3], vv[i][4] };
     }
 
+    Vertex* pointsNormals = new Vertex[size];
+    for (int i = 0; i < size; i++)
+    {
+        pointsNormals[i] = { vv[i][5], vv[i][6], vv[i][7] };
+    }
+
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsCoord, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
     glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsTexture, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsNormals, GL_STATIC_DRAW);
 
     checkOpenGLerror();
     //textureData.loadFromFile("bus2.jpg");
@@ -533,6 +575,7 @@ void InitBus()
             (GLfloat)size,  // количество вершин в каждом буфере
             vertexVBO,
             textureVBO,
+            normalVBO,
             textureData.getNativeHandle(), 
             {0, 0},
             {-1.6f, 0.0f, 3.15f}, 
@@ -548,21 +591,32 @@ void InitGrass()
     parseObjFile(pol, "model/grass.obj");
     GLuint vertexVBO;
     GLuint textureVBO;
+    GLuint normalVBO;
     glGenBuffers(1, &vertexVBO);
     glGenBuffers(1, &textureVBO);
+    glGenBuffers(1, &normalVBO);
     VBOArray.push_back(vertexVBO);
     VBOArray.push_back(textureVBO);
+    VBOArray.push_back(normalVBO);
+
+    vector<float> busCenter;
+    busCenter.push_back(1.0);
+    busCenter.push_back(0.0);
+    busCenter.push_back(0.0);
 
     vector<vector<float>> vv;
     for (Triangle tr : pol.polygons)
     {
         for (int i = 0; i <= 2; i++)
         {
-            vv.push_back({ tr.points[i].x, tr.points[i].y, tr.points[i].z, tr.texture[i].u, tr.texture[i].v, tr.normal[i].x, tr.normal[i].y, tr.normal[i].z });
+            // vv.push_back({ tr.points[i].x, tr.points[i].y, tr.points[i].z, tr.texture[i].u, tr.texture[i].v, tr.normal[i].x, tr.normal[i].y, tr.normal[i].z });
+            vv.push_back({ tr.points[i].x + busCenter[0], tr.points[i].y + busCenter[1], tr.points[i].z + busCenter[2] , tr.texture[i].u, tr.texture[i].v, tr.normal[i].x, tr.normal[i].y, tr.normal[i].z });
         }
     }
 
     // структура: вершина(3) текстура(2) нормаль(3) цвет(3)
+
+
     int size = vv.size();
     Vertex* pointsCoord = new Vertex[size];
     for (int i = 0; i < size; i++)
@@ -576,33 +630,41 @@ void InitGrass()
         pointsTexture[i] = { vv[i][3], vv[i][4] };
     }
 
+    Vertex* pointsNormals = new Vertex[size];
+    for (int i = 0; i < size; i++)
+    {
+        pointsNormals[i] = { vv[i][5], vv[i][6], vv[i][7] };
+    }
+
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
     glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsCoord, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
     glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsTexture, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsNormals, GL_STATIC_DRAW);
 
     checkOpenGLerror();
+    //textureData.loadFromFile("bus2.jpg");
+    //sf::Texture::bind(&textureData);
 
     const char* filename = "model/grass.png";
     textureData.loadFromFile(filename);
     textureDataVector.push_back(textureData);
+    //sf::Texture::bind(&textureData);
     // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
     rotateGlob[0] = -1.66;
     rotateGlob[1] = 2.91f;
     rotateGlob[2] = 3.05;
-
     gameObjects.push_back(
         GameObject
         {
             (GLfloat)size,  // количество вершин в каждом буфере
             vertexVBO,
             textureVBO,
+            normalVBO,
             textureData.getNativeHandle(),
             {1.0f, 1.0f},
-            {-1.66, 2.91f, 3.05}/*,
-            {-1.0f, 1.0f, 1.0f},
-            {1.5f, 0.21f, 5.8804f}*/
-            // -1.66 2.91 3.05
+            {-1.66, 2.91f, 3.05}
         }
     ); //192023
 }
@@ -649,6 +711,10 @@ void Draw(GameObject gameObject, int index = 0) {
     glEnableVertexAttribArray(shaderInformation.attribTexture);
     glBindBuffer(GL_ARRAY_BUFFER, gameObject.textureVBO);
     glVertexAttribPointer(shaderInformation.attribTexture, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glEnableVertexAttribArray(shaderInformation.attribNormal);
+    glBindBuffer(GL_ARRAY_BUFFER, gameObject.normalVBO);
+    glVertexAttribPointer(shaderInformation.attribNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
