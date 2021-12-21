@@ -39,6 +39,8 @@ struct ShaderInformation {
 
     // View vector
     GLuint Unif_eyePos;
+    // unif lightOn
+    GLuint unif_lightOn;
 };
 
 struct GameObject {
@@ -59,13 +61,15 @@ struct GameObject {
     GLfloat scaleBus[3] = { 1.0f, 1.0f, 1.0f };
     GLfloat shiftBus[3] = { 0.0f, 0.0f, 0.0f };
 
-    GLfloat lightPos[3] = { 1.0f, 1.0f, 1.0f };
+    GLfloat lightPos[3] = { 0.0f, 1.0f, 0.0f };
     // View vector
-    GLfloat eyePos[3] = { 1.0f,1.0f,1.0f };
+    GLfloat eyePos[3] = { 1.0f,1.0f,-10.0f };
+    GLboolean lightOn = true;
 };
 
 float offset[3] = { 0.02, -2.74, 0.9 };
 float rotateGlob[3] = { -1.57, 0.0, 3.14 };
+GLboolean lightOnGlobal = true;
 
 sf::Texture textureData;
 vector<sf::Texture> textureDataVector;
@@ -98,6 +102,7 @@ uniform vec3 unifBusScale;
 uniform vec3 unifBusShift;
 uniform vec3 lightPos;
 uniform vec3 eyePos;
+uniform bool unif_lightOn;
 
 in vec3 vertCoord;
 in vec3 texureCoord;
@@ -167,6 +172,7 @@ void main() {
     );;
     // TODO: remove lightPos and eyePos;
     gl_Position = vec4(normalCoord, 1.0f);
+    if (unif_lightOn) { gl_Position = vec4(normalCoord, 1.0f); }
     gl_Position = transform.viewProjection * position2;
 }
 );
@@ -175,14 +181,15 @@ const char* FragShaderSource = TO_STRING(
     \#version 330 core\n
 
     uniform sampler2D textureData;
+uniform bool unif_lightOn;
 in vec2 tCoord;
 in vec3 vnormal;
 in vec3 lightp;
 in vec3 vnew;
 out vec4 color;
 
-const vec4 diffColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);
-const vec4 specColor = vec4(0.7f, 0.7f, 0.0f, 1.0f);
+const vec4 diffColor = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+const vec4 specColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 const float specPower = 30.0f;
 
 void main() {
@@ -193,7 +200,8 @@ void main() {
     vec4 diff = diffColor * max(dot(n2, l2), 0.0f);
     vec4 spec = specColor * pow(max(dot(l2, r), 0.0f), specPower);
 
-    color = texture(textureData, tCoord) + (diff + spec);
+    color = texture(textureData, tCoord);
+    if (!unif_lightOn) { color = color * 0.4f + (diff + spec); }
 }
 );
 
@@ -265,6 +273,7 @@ int main() {
                 case (sf::Keyboard::Down):  decAxis(1); break;
                 case (sf::Keyboard::PageUp):  decAxis(2); break;
                 case (sf::Keyboard::PageDown):  incAxis(2); break;
+                case (sf::Keyboard::L):  lightOnGlobal = !lightOnGlobal; break;
                 default: break;
                 }
             }
@@ -290,7 +299,7 @@ int main() {
             gameObjects[7].rotateBus[0] = rotateGlob[0];
             gameObjects[7].rotateBus[1] = rotateGlob[1];
             gameObjects[7].rotateBus[2] = rotateGlob[2];
-
+            object.lightOn = lightOnGlobal;
             Draw(object, i++);
             //Draw(gameObjects[6], 6);
         }
@@ -371,13 +380,13 @@ void InitObjects()
     };
 
     Vertex normal[] = {
-        { -0.5f, -0.5f, 0.0f },
-        { +0.5f, -0.5f, 0.0f },
-        { +0.5f, +0.5f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
 
-        { +0.5f, +0.5f, 0.0f },
-        { -0.5f, +0.5f, 0.0f },
-        { -0.5f, -0.5f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
     };
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
@@ -510,6 +519,13 @@ void InitShader() {
         std::cout << "could not bind uniform " << unif_name << std::endl;
         return;
     }
+    shaderInformation.unif_lightOn = glGetUniformLocation(shaderInformation.shaderProgram, "unif_lightOn");
+    if (shaderInformation.unif_lightOn == -1)
+    {
+        std::cout << "could not bind unif_lightOn" << std::endl;
+        return;
+    }
+    
 
     /*const char* unif_name = "xpos";
     Unif_posx = glGetUniformLocation(Program, unif_name);
@@ -739,6 +755,7 @@ void Draw(GameObject gameObject, int index = 0) {
     glUniform3fv(shaderInformation.unifBusShift, 1, gameObject.shiftBus);
     glUniform3fv(shaderInformation.Unif_lightPos, 1, gameObject.lightPos);
     glUniform3fv(shaderInformation.Unif_eyePos, 1, gameObject.eyePos);
+    glUniform1i(shaderInformation.unif_lightOn, gameObject.lightOn);
     transform();
     glActiveTexture(GL_TEXTURE0);
     sf::Texture::bind(&textureDataVector[index]);
