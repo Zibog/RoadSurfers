@@ -104,15 +104,42 @@ in vec3 texureCoord;
 in vec3 normalCoord;
 
 out vec2 tCoord;
+out vec3 vnormal;
+out vec3 lightp;
+out vec3 vnew;
 
 void main() {
     float x_angle = unifBusRotate.x;
     float y_angle = unifBusRotate.y;
     float z_angle = unifBusRotate.z;
-    vec3 t = lightPos;
-    vec3 t2 = lightPos * eyePos;
+
+    mat3 aff = mat3(
+        1, 0, 0,
+        0, cos(x_angle), -sin(x_angle),
+        0, sin(x_angle), cos(x_angle)
+    ) * mat3(
+        cos(y_angle), 0, sin(y_angle),
+        0, 1, 0,
+        -sin(y_angle), 0, cos(y_angle)
+    ) * mat3(
+        cos(z_angle), -sin(z_angle), 0,
+        sin(z_angle), cos(z_angle), 0,
+        0, 0, 1
+    );
+
+    vec3 position = vertCoord * aff;
+
+    vec3 newNormale = mat3(transpose(inverse(aff))) * normalCoord;
+    vec3 lposition = lightPos;
+
+    vec3 temp = lposition;
+    vec3 temp1 = eyePos;
+
+    vnormal = newNormale;
+    lightp = temp - position;
+    vnew = temp1 - position;
     
-    vec3 position = vertCoord * mat3(
+    position = vertCoord * mat3(
         1, 0, 0,
         0, cos(x_angle), -sin(x_angle),
         0, sin(x_angle), cos(x_angle)
@@ -140,7 +167,7 @@ void main() {
     );;
     // TODO: remove lightPos and eyePos;
     gl_Position = vec4(normalCoord, 1.0f);
-    gl_Position = transform.viewProjection * position2 * vec4(lightPos, 1.0f) * vec4(eyePos, 1.0f);
+    gl_Position = transform.viewProjection * position2;
 }
 );
 
@@ -149,10 +176,24 @@ const char* FragShaderSource = TO_STRING(
 
     uniform sampler2D textureData;
 in vec2 tCoord;
+in vec3 vnormal;
+in vec3 lightp;
+in vec3 vnew;
 out vec4 color;
 
+const vec4 diffColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);
+const vec4 specColor = vec4(0.7f, 0.7f, 0.0f, 1.0f);
+const float specPower = 30.0f;
+
 void main() {
-    color = texture(textureData, tCoord);
+    vec3 n2 = normalize(vnormal);
+    vec3 l2 = normalize(lightp);
+    vec3 v2 = normalize(vnew);
+    vec3 r = reflect(-v2, n2);
+    vec4 diff = diffColor * max(dot(n2, l2), 0.0f);
+    vec4 spec = specColor * pow(max(dot(l2, r), 0.0f), specPower);
+
+    color = texture(textureData, tCoord) + (diff + spec);
 }
 );
 
