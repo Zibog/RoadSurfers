@@ -34,6 +34,9 @@ struct ShaderInformation {
 
     // Light position
     GLuint Unif_lightPos;
+
+    // View vector
+    GLuint Unif_eyePos;
 };
 
 struct GameObject {
@@ -53,6 +56,8 @@ struct GameObject {
     GLfloat shiftBus[3] = { 0.0f, 0.0f, 0.0f };
 
     GLfloat lightPos[3] = { 1.0f, 1.0f, 1.0f };
+    // View vector
+    GLfloat eyePos[3] = { 1.0f,1.0f,1.0f };
 };
 
 float offset[3] = { 0.02, -2.74, 0.9 };
@@ -88,7 +93,7 @@ uniform vec3 unifBusRotate;
 uniform vec3 unifBusScale;
 uniform vec3 unifBusShift;
 uniform vec3 lightPos;
-
+uniform vec3 eyePos;
 
 in vec3 vertCoord;
 in vec3 texureCoord;
@@ -100,6 +105,7 @@ void main() {
     float y_angle = unifBusRotate.y;
     float z_angle = unifBusRotate.z;
     vec3 t = lightPos;
+    vec3 t2 = lightPos * eyePos;
     vec3 position = vertCoord * mat3(
         1, 0, 0,
         0, cos(x_angle), -sin(x_angle),
@@ -126,7 +132,8 @@ void main() {
         0, 0, 1, unifBusShift.z,
         0, 0, 0, 1
     );;
-    gl_Position = transform.viewProjection * position2 * vec4(lightPos, 1.0f);
+    // TODO: remove lightPos;
+    gl_Position = transform.viewProjection * position2 * vec4(lightPos, 1.0f) * vec4(eyePos, 1.0f);
 }
 );
 
@@ -424,6 +431,13 @@ void InitShader() {
         std::cout << "could not bind uniform " << unif_name << std::endl;
         return;
     }
+    unif_name = "eyePos";
+    shaderInformation.Unif_eyePos = glGetUniformLocation(shaderInformation.shaderProgram, unif_name);
+    if (shaderInformation.Unif_eyePos == -1)
+    {
+        std::cout << "could not bind uniform " << unif_name << std::endl;
+        return;
+    }
 
     /*const char* unif_name = "xpos";
     Unif_posx = glGetUniformLocation(Program, unif_name);
@@ -621,6 +635,7 @@ void Draw(GameObject gameObject, int index = 0) {
     glUniform3fv(shaderInformation.unifBusScale, 1, gameObject.scaleBus);
     glUniform3fv(shaderInformation.unifBusShift, 1, gameObject.shiftBus);
     glUniform3fv(shaderInformation.Unif_lightPos, 1, gameObject.lightPos);
+    glUniform3fv(shaderInformation.Unif_eyePos, 1, gameObject.eyePos);
     transform();
     glActiveTexture(GL_TEXTURE0);
     sf::Texture::bind(&textureDataVector[index]);
