@@ -144,6 +144,7 @@ void Draw(GameObject gameObject, int i);
 void Release();
 void transform();
 void InitBus();
+void InitGrass();
 
 void decAxis(int axis)//0x 1y 2z
 {
@@ -216,12 +217,19 @@ int main() {
         // Отрисовываем все объекты сцены
         for (GameObject& object : gameObjects)
         {
-            gameObjects[6].shiftBus[0] = offset[0];
-            gameObjects[6].shiftBus[1] = offset[1];
-            gameObjects[6].shiftBus[2] = offset[2];
-            gameObjects[6].rotateBus[0] = rotateGlob[0];
-            gameObjects[6].rotateBus[1] = rotateGlob[1];
-            gameObjects[6].rotateBus[2] = rotateGlob[2];
+            //gameObjects[6].shiftBus[0] = offset[0];
+            //gameObjects[6].shiftBus[1] = offset[1];
+            //gameObjects[6].shiftBus[2] = offset[2];
+            //gameObjects[6].rotateBus[0] = rotateGlob[0];
+            //gameObjects[6].rotateBus[1] = rotateGlob[1];
+            //gameObjects[6].rotateBus[2] = rotateGlob[2];
+
+            gameObjects[7].shiftBus[0] = offset[0];
+            gameObjects[7].shiftBus[1] = offset[1];
+            gameObjects[7].shiftBus[2] = offset[2];
+            gameObjects[7].rotateBus[0] = rotateGlob[0];
+            gameObjects[7].rotateBus[1] = rotateGlob[1];
+            gameObjects[7].rotateBus[2] = rotateGlob[2];
 
             Draw(object, i++);
             //Draw(gameObjects[6], 6);
@@ -313,7 +321,7 @@ void InitObjects()
      // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
     for (int i = 0; i < numberOfSquares; ++i)
     {
-        const char* filename = "road.png";
+        const char* filename = "model/road.png";
         textureData.loadFromFile(filename);
         gameObjects.push_back(GameObject{
                 6,  // количество вершин в каждом буфере
@@ -431,6 +439,7 @@ void Init() {
     //InitTexture();
     InitObjects();
     InitBus();
+    InitGrass();
     glEnable(GL_DEPTH_TEST);
 
 }
@@ -492,12 +501,84 @@ void InitBus()
     textureDataVector.push_back(textureData);
     //sf::Texture::bind(&textureData);
     // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
-    gameObjects.push_back(GameObject{
+    gameObjects.push_back(
+        GameObject
+        {
             (GLfloat)size,  // количество вершин в каждом буфере
             vertexVBO,
             textureVBO,
-            textureData.getNativeHandle(), {0, 0} , {-1.6f, 0.0f, 3.15f}, {0.02f, 0.013f, 0.02f},
-        {0.02f, -2.7f, 0.9f} });
+            textureData.getNativeHandle(), 
+            {0, 0},
+            {-1.6f, 0.0f, 3.15f}, 
+            {0.02f, 0.013f, 0.02f},
+            {0.02f, -2.7f, 0.9f} 
+        }
+    );
+}
+
+void InitGrass()
+{
+    Polyhedron pol;
+    parseObjFile(pol, "model/grass.obj");
+    GLuint vertexVBO;
+    GLuint textureVBO;
+    glGenBuffers(1, &vertexVBO);
+    glGenBuffers(1, &textureVBO);
+    VBOArray.push_back(vertexVBO);
+    VBOArray.push_back(textureVBO);
+
+    vector<vector<float>> vv;
+    for (Triangle tr : pol.polygons)
+    {
+        for (int i = 0; i <= 2; i++)
+        {
+            vv.push_back({ tr.points[i].x, tr.points[i].y, tr.points[i].z, tr.texture[i].u, tr.texture[i].v, tr.normal[i].x, tr.normal[i].y, tr.normal[i].z });
+        }
+    }
+
+    // структура: вершина(3) текстура(2) нормаль(3) цвет(3)
+    int size = vv.size();
+    Vertex* pointsCoord = new Vertex[size];
+    for (int i = 0; i < size; i++)
+    {
+        pointsCoord[i] = { vv[i][0], vv[i][1], vv[i][2] };
+    }
+
+    Vertex* pointsTexture = new Vertex[size];
+    for (int i = 0; i < size; i++)
+    {
+        pointsTexture[i] = { vv[i][3], vv[i][4] };
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsCoord, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsTexture, GL_STATIC_DRAW);
+
+    checkOpenGLerror();
+
+    const char* filename = "model/grass.png";
+    textureData.loadFromFile(filename);
+    textureDataVector.push_back(textureData);
+    // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
+    rotateGlob[0] = -1.66;
+    rotateGlob[1] = 2.91f;
+    rotateGlob[2] = 3.05;
+
+    gameObjects.push_back(
+        GameObject
+        {
+            (GLfloat)size,  // количество вершин в каждом буфере
+            vertexVBO,
+            textureVBO,
+            textureData.getNativeHandle(),
+            {1.0f, 1.0f},
+            {-1.66, 2.91f, 3.05}/*,
+            {-1.0f, 1.0f, 1.0f},
+            {1.5f, 0.21f, 5.8804f}*/
+            // -1.66 2.91 3.05
+        }
+    ); //192023
 }
 
 float view_pos[]{ 0, -3, 2 };
