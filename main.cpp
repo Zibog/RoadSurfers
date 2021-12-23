@@ -52,14 +52,17 @@ void GameTick(int tick) {
         gameObjects[i].shift[1] = 10.0f - ((tick + (frequency * i)) % (numberOfSquares * frequency)) / (float)frequency;
     
     }
-    gameObjects[numberOfSquares + 2].shift[1] -= frequency/1000.0;
-    cout << "shift: " << gameObjects[numberOfSquares + 2].shift[1] << "\n";
-    if (gameObjects[numberOfSquares + 2].shift[1] < -10) {
-        gameObjects[numberOfSquares + 2].shift[1] += 40;
-        int r = std::rand() % 3 - 1;
-        gameObjects[numberOfSquares + 2].shift[0] = r * 4.5 + 1.0f;
+    for (int i = numberOfSquares+2; i < gameObjects.size(); ++i)
+    {
+        gameObjects[i].shift[1] -= 0.1;
+        if (gameObjects[i].shift[1] < -10) {
+            gameObjects[i].shift[1] += 40;
+            int r = std::rand() % 3 - 1;
+            gameObjects[i].shift[0] = r * 4.5f + 1.0f;
+        }
+
     }
-   
+    
 }
 glm::mat4 view_projection = glm::perspective(
     glm::radians(90.0f), // Вертикальное поле зрения в радианах. Обычно между 90&deg; (очень широкое) и 30&deg; (узкое)

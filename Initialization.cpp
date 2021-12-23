@@ -1,5 +1,7 @@
 ﻿#include <gl/glew.h>
+#include <cstdlib>
 #include <iostream>
+#include <ctime>
 #include "ShadeStructs.h"
 #include "Helpers.h"
 #include "Polyhedron.h"
@@ -405,7 +407,7 @@ void InitGrass()
     ); //192023
 }
 
-void InitCone()
+void InitCone(int ind)
 {
     Polyhedron pol;
     parseObjFile(pol, "model/cone.obj");
@@ -473,6 +475,7 @@ void InitCone()
     const char* filename = "model/cone.png";
     textureData.loadFromFile(filename);
     textureDataVector.push_back(textureData);
+    int r = std::rand() % 3 - 1;
     // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
     gameObjects.push_back(
         GameObject
@@ -482,7 +485,7 @@ void InitCone()
             textureVBO,
             normalVBO,
             textureData.getNativeHandle(),
-            {1.0f, 20.0f},
+            {1.0f+r*4.5f, (ind+1)*10.0f},
             {-1.6, 0.0f, 3.0},//-0.005 -2.36499 0.9
             { 0.08f, 0.08f, 0.08f },
             { 0.0f, -2.365f, 0.9f }
@@ -495,6 +498,8 @@ void Init() {
     InitRoad();
     InitBus();
     InitGrass();
-    InitCone();
+    for (int i = 0; i < 3; i++) {
+        InitCone(i);
+    }
     glEnable(GL_DEPTH_TEST);
 }
