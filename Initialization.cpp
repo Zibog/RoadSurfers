@@ -405,10 +405,96 @@ void InitGrass()
     ); //192023
 }
 
+void InitCone()
+{
+    Polyhedron pol;
+    parseObjFile(pol, "model/cone.obj");
+    GLuint vertexVBO;
+    GLuint textureVBO;
+    GLuint normalVBO;
+    glGenBuffers(1, &vertexVBO);
+    glGenBuffers(1, &textureVBO);
+    glGenBuffers(1, &normalVBO);
+    VBOArray.push_back(vertexVBO);
+    VBOArray.push_back(textureVBO);
+    VBOArray.push_back(normalVBO);
+
+    vector<float> busCenter;
+    busCenter.push_back(1.0);
+    busCenter.push_back(0.0);
+    busCenter.push_back(0.0);
+
+    vector<vector<float>> vv;
+    for (Triangle tr : pol.polygons)
+    {
+        for (int i = 0; i <= 2; i++)
+        {
+            vv.push_back({
+                tr.points[i].x + busCenter[0],
+                tr.points[i].y + busCenter[1],
+                tr.points[i].z + busCenter[2] ,
+                tr.texture[i].u,
+                tr.texture[i].v,
+                tr.normal[i].x,
+                tr.normal[i].y,
+                tr.normal[i].z });
+        }
+    }
+
+    // структура: вершина(3) текстура(2) нормаль(3) цвет(3)
+    int size = vv.size();
+    Vertex* pointsCoord = new Vertex[size];
+    for (int i = 0; i < size; i++)
+    {
+        pointsCoord[i] = { vv[i][0], vv[i][1], vv[i][2] };
+    }
+
+    Vertex* pointsTexture = new Vertex[size];
+    for (int i = 0; i < size; i++)
+    {
+        pointsTexture[i] = { vv[i][3], vv[i][4] };
+    }
+
+    Vertex* pointsNormals = new Vertex[size];
+    for (int i = 0; i < size; i++)
+    {
+        pointsNormals[i] = { vv[i][5], vv[i][6], vv[i][7] };
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsCoord, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsTexture, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsNormals, GL_STATIC_DRAW);
+
+    checkOpenGLerror();
+
+    const char* filename = "model/cone.png";
+    textureData.loadFromFile(filename);
+    textureDataVector.push_back(textureData);
+    // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
+    gameObjects.push_back(
+        GameObject
+        {
+            (GLfloat)size,  // количество вершин в каждом буфере
+            vertexVBO,
+            textureVBO,
+            normalVBO,
+            textureData.getNativeHandle(),
+            {1.0f, 1.0f},
+            {-1.6, 0.0f, 3.0},//-0.005 -2.36499 0.9
+            { 0.08f, 0.08f, 0.08f },
+            { 0.0f, -2.365f, 0.9f }
+        }
+    );
+}
+
 void Init() {
     InitShader();
     InitRoad();
     InitBus();
     InitGrass();
+    InitCone();
     glEnable(GL_DEPTH_TEST);
 }
