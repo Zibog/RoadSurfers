@@ -19,13 +19,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Control.cpp" />
+    <ClCompile Include="Helpers.cpp" />
+    <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="Shaders.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Control.h" />
+    <ClInclude Include="Helpers.h" />
+    <ClInclude Include="Initialization.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="Polyhedron.h" />
+    <ClInclude Include="ShadeStructs.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
