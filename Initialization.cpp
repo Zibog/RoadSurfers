@@ -1,4 +1,4 @@
-#include <gl/glew.h>
+п»ї#include <gl/glew.h>
 #include <iostream>
 #include "ShadeStructs.h"
 #include "Helpers.h"
@@ -12,7 +12,7 @@ extern sf::Texture textureData;
 extern vector<sf::Texture> textureDataVector;
 extern std::vector <GameObject> gameObjects;
 extern ShaderInformation shaderInformation;
-// Массив VBO что бы их потом удалить
+// РњР°СЃСЃРёРІ VBO С‡С‚Рѕ Р±С‹ РёС… РїРѕС‚РѕРј СѓРґР°Р»РёС‚СЊ
 extern std::vector <GLuint> VBOArray;
 extern int  numberOfSquares;
 extern float rotateGlob[3];
@@ -21,7 +21,7 @@ extern const char* VertexShaderSource;
 extern const char* FragShaderSource;
 
 
-void InitObjects()
+void InitRoad()
 {
     GLuint vertexVBO;
     GLuint textureVBO;
@@ -33,7 +33,7 @@ void InitObjects()
     VBOArray.push_back(textureVBO);
     VBOArray.push_back(normalVBO);
 
-    // Объявляем вершины треугольника
+    // РћР±СЉСЏРІР»СЏРµРј РІРµСЂС€РёРЅС‹ С‚СЂРµСѓРіРѕР»СЊРЅРёРєР°
     Vertex triangle[] = {
         { -0.5f, -0.5f, 0.0f },
         { +0.5f, -0.5f, 0.0f },
@@ -44,7 +44,7 @@ void InitObjects()
         { -0.5f, -0.5f, 0.0f },
     };
 
-    // Объявляем текстурные координаты
+    // РћР±СЉСЏРІР»СЏРµРј С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹
     Vertex texture[] = {
         { 0.0f, 1.0f },
         { 1.0f, 1.0f },
@@ -74,28 +74,22 @@ void InitObjects()
 
     checkOpenGLerror();
 
-
-
-    // sf::Texture::bind(&textureData);
-
-     // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
+    // Р”РѕР±Р°РІР»СЏРµРј С‚СЂРё РѕРґРёРЅР°РєРѕРІС‹С… РѕР±СЉРµРєС‚, РјРµРЅСЏС‚СЊ РёРј СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РјС‹ Р±СѓРґРµРј РїРѕС‚РѕРј РїСЂРё РѕР±СЂР°Р±РѕС‚РєРµ РєР°Р¶РґРѕРіРѕ РєР°РґСЂР°
     for (int i = 0; i < numberOfSquares; ++i)
     {
         const char* filename = "model/road.png";
         textureData.loadFromFile(filename);
         gameObjects.push_back(GameObject{
-                6,  // количество вершин в каждом буфере
+                6,  // РєРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ РІ РєР°Р¶РґРѕРј Р±СѓС„РµСЂРµ
                 vertexVBO,
                 textureVBO,
                 normalVBO,
                 textureData.getNativeHandle(), {0, 0} });
 
         textureDataVector.push_back(textureData);
-        //InitBus();
     }
 
 }
-
 
 void InitShader() {
     GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
@@ -175,12 +169,14 @@ void InitShader() {
         std::cout << "could not bind uniform bus angle" << std::endl;
         return;
     }
+
     shaderInformation.unifBusShift = glGetUniformLocation(shaderInformation.shaderProgram, "unifBusShift");
     if (shaderInformation.unifBusShift == -1)
     {
         std::cout << "could not bind uniform bus angle" << std::endl;
         return;
     }
+
     const char* unif_name = "lightPos";
     shaderInformation.Unif_lightPos = glGetUniformLocation(shaderInformation.shaderProgram, unif_name);
     if (shaderInformation.Unif_lightPos == -1)
@@ -188,6 +184,7 @@ void InitShader() {
         std::cout << "could not bind uniform " << unif_name << std::endl;
         return;
     }
+
     unif_name = "eyePos";
     shaderInformation.Unif_eyePos = glGetUniformLocation(shaderInformation.shaderProgram, unif_name);
     if (shaderInformation.Unif_eyePos == -1)
@@ -195,6 +192,7 @@ void InitShader() {
         std::cout << "could not bind uniform " << unif_name << std::endl;
         return;
     }
+
     shaderInformation.unif_lightOn = glGetUniformLocation(shaderInformation.shaderProgram, "unif_lightOn");
     if (shaderInformation.unif_lightOn == -1)
     {
@@ -202,30 +200,11 @@ void InitShader() {
         return;
     }
 
-
-    /*const char* unif_name = "xpos";
-    Unif_posx = glGetUniformLocation(Program, unif_name);
-    if (Unif_posx == -1)
-    {
-        std::cout << "could not bind uniform " << unif_name << std::endl;
-        return;
-    }*/
     checkOpenGLerror();
 }
 
-
-//void InitTexture()
-//{
-//    //const char* filename = "image.jpg";
-//    const char* filename = "road.jpg";
-//    if (!textureData.loadFromFile(filename))
-//    {
-//        std::cout << "could not load texture" << std::endl;
-//    }
-//}
 void InitBus()
 {
-    //GameObject.rotateBus[0] = 1;
     Polyhedron pol;
     parseObjFile(pol, "model/bus2.obj");
     GLuint vertexVBO;
@@ -245,21 +224,25 @@ void InitBus()
 
     rotateGlob[0] = -1.66;
     rotateGlob[2] = 3.14;
-    //  rotateGlob[2] = 3.05;
 
     vector<vector<float>> vv;
     for (Triangle tr : pol.polygons)
     {
         for (int i = 0; i <= 2; i++)
         {
-            // vv.push_back({ tr.points[i].x, tr.points[i].y, tr.points[i].z, tr.texture[i].u, tr.texture[i].v, tr.normal[i].x, tr.normal[i].y, tr.normal[i].z });
-            vv.push_back({ tr.points[i].x + busCenter[0], tr.points[i].y + busCenter[1], tr.points[i].z + busCenter[2] , tr.texture[i].u, tr.texture[i].v, tr.normal[i].x, tr.normal[i].y, tr.normal[i].z });
+           vv.push_back({ 
+               tr.points[i].x + busCenter[0], 
+               tr.points[i].y + busCenter[1], 
+               tr.points[i].z + busCenter[2] , 
+               tr.texture[i].u, 
+               tr.texture[i].v, 
+               tr.normal[i].x, 
+               tr.normal[i].y, 
+               tr.normal[i].z });
         }
     }
 
-    // структура: вершина(3) текстура(2) нормаль(3) цвет(3)
-
-
+    // СЃС‚СЂСѓРєС‚СѓСЂР°: РІРµСЂС€РёРЅР°(3) С‚РµРєСЃС‚СѓСЂР°(2) РЅРѕСЂРјР°Р»СЊ(3) С†РІРµС‚(3)
     int size = vv.size();
     Vertex* pointsCoord = new Vertex[size];
     for (int i = 0; i < size; i++)
@@ -287,18 +270,15 @@ void InitBus()
     glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsNormals, GL_STATIC_DRAW);
 
     checkOpenGLerror();
-    //textureData.loadFromFile("bus2.jpg");
-    //sf::Texture::bind(&textureData);
 
     const char* filename = "model/bus2.png";
     textureData.loadFromFile(filename);
     textureDataVector.push_back(textureData);
-    //sf::Texture::bind(&textureData);
-    // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
+    // Р”РѕР±Р°РІР»СЏРµРј С‚СЂРё РѕРґРёРЅР°РєРѕРІС‹С… РѕР±СЉРµРєС‚, РјРµРЅСЏС‚СЊ РёРј СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РјС‹ Р±СѓРґРµРј РїРѕС‚РѕРј РїСЂРё РѕР±СЂР°Р±РѕС‚РєРµ РєР°Р¶РґРѕРіРѕ РєР°РґСЂР°
     gameObjects.push_back(
         GameObject
         {
-            (GLfloat)size,  // количество вершин в каждом буфере
+            (GLfloat)size,  // РєРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ РІ РєР°Р¶РґРѕРј Р±СѓС„РµСЂРµ
             vertexVBO,
             textureVBO,
             normalVBO,
@@ -336,14 +316,19 @@ void InitGrass()
     {
         for (int i = 0; i <= 2; i++)
         {
-            // vv.push_back({ tr.points[i].x, tr.points[i].y, tr.points[i].z, tr.texture[i].u, tr.texture[i].v, tr.normal[i].x, tr.normal[i].y, tr.normal[i].z });
-            vv.push_back({ tr.points[i].x + busCenter[0], tr.points[i].y + busCenter[1], tr.points[i].z + busCenter[2] , tr.texture[i].u, tr.texture[i].v, tr.normal[i].x, tr.normal[i].y, tr.normal[i].z });
+            vv.push_back({ 
+                tr.points[i].x + busCenter[0], 
+                tr.points[i].y + busCenter[1], 
+                tr.points[i].z + busCenter[2] , 
+                tr.texture[i].u, 
+                tr.texture[i].v, 
+                tr.normal[i].x, 
+                tr.normal[i].y, 
+                tr.normal[i].z });
         }
     }
 
-    // структура: вершина(3) текстура(2) нормаль(3) цвет(3)
-
-
+    // СЃС‚СЂСѓРєС‚СѓСЂР°: РІРµСЂС€РёРЅР°(3) С‚РµРєСЃС‚СѓСЂР°(2) РЅРѕСЂРјР°Р»СЊ(3) С†РІРµС‚(3)
     int size = vv.size();
     Vertex* pointsCoord = new Vertex[size];
     for (int i = 0; i < size; i++)
@@ -371,35 +356,59 @@ void InitGrass()
     glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsNormals, GL_STATIC_DRAW);
 
     checkOpenGLerror();
-    //textureData.loadFromFile("bus2.jpg");
-    //sf::Texture::bind(&textureData);
 
     const char* filename = "model/grass.png";
     textureData.loadFromFile(filename);
     textureDataVector.push_back(textureData);
-    //sf::Texture::bind(&textureData);
-    // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
-
+    // Р”РѕР±Р°РІР»СЏРµРј С‚СЂРё РѕРґРёРЅР°РєРѕРІС‹С… РѕР±СЉРµРєС‚, РјРµРЅСЏС‚СЊ РёРј СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ РјС‹ Р±СѓРґРµРј РїРѕС‚РѕРј РїСЂРё РѕР±СЂР°Р±РѕС‚РєРµ РєР°Р¶РґРѕРіРѕ РєР°РґСЂР°
     gameObjects.push_back(
         GameObject
         {
-            (GLfloat)size,  // количество вершин в каждом буфере
+            (GLfloat)size,  // РєРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ РІ РєР°Р¶РґРѕРј Р±СѓС„РµСЂРµ
             vertexVBO,
             textureVBO,
             normalVBO,
             textureData.getNativeHandle(),
             {1.0f, 1.0f},
-            {-1.66, 2.91f, 3.05}
+            //{-1.66, 2.91f, 3.05}
+            {-1.6, -0.17f, 3.93},
+            { 1.0f, 1.0f, 1.0f },
+            { 0.02f, -19.74f, 18.9f }
+            /*
+            -1.62 -0.13 3.93
+            -1.63 -0.13 3.93
+            -1.62 -0.13 3.93
+            -1.62 -0.14 3.93
+            -1.61 -0.14 3.93
+            inc 2
+            0.02 -19.74 17.9
+            dec 2
+            0.02 -19.74 18.4
+            dec 2
+            0.02 -19.74 18.9
+            -1.62 -0.14 3.93
+            -1.61 -0.14 3.93
+            -1.6 -0.14 3.93
+            -1.59 -0.14 3.93
+            -1.58 -0.14 3.93
+            -1.57 -0.14 3.93
+            -1.58 -0.14 3.93
+            -1.58 -0.15 3.93
+            -1.57 -0.15 3.93
+            -1.58 -0.15 3.93
+            -1.59 -0.15 3.93
+            -1.59 -0.16 3.93
+            -1.6 -0.16 3.93
+            -1.6 -0.17 3.93
+            */
         }
     ); //192023
 }
 
 void Init() {
     InitShader();
-    //InitTexture();
-    InitObjects();
+    InitRoad();
     InitBus();
     InitGrass();
     glEnable(GL_DEPTH_TEST);
-
 }

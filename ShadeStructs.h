@@ -1,19 +1,19 @@
-#pragma once
+п»ї#pragma once
 #include <gl/glew.h>
 
 struct ShaderInformation {
-    // Переменные с индентификаторами ID
-    // ID шейдерной программы
+    // РџРµСЂРµРјРµРЅРЅС‹Рµ СЃ РёРЅРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°РјРё ID
+    // ID С€РµР№РґРµСЂРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹
     GLuint shaderProgram;
-    // ID атрибута вершин
+    // ID Р°С‚СЂРёР±СѓС‚Р° РІРµСЂС€РёРЅ
     GLint attribVertex;
-    // ID атрибута текстурных координат
+    // ID Р°С‚СЂРёР±СѓС‚Р° С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
     GLint attribTexture;
-    // ID атрибута нормали
+    // ID Р°С‚СЂРёР±СѓС‚Р° РЅРѕСЂРјР°Р»Рё
     GLint attribNormal;
-    // ID юниформа текстуры
+    // ID СЋРЅРёС„РѕСЂРјР° С‚РµРєСЃС‚СѓСЂС‹
     GLint unifTexture;
-    // ID юниформа сдвига
+    // ID СЋРЅРёС„РѕСЂРјР° СЃРґРІРёРіР°
     GLint unifShift;
 
     GLint unifBusRotate;
@@ -30,22 +30,22 @@ struct ShaderInformation {
 };
 
 struct GameObject {
-    // Количество вершин в буферах
+    // РљРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ РІ Р±СѓС„РµСЂР°С…
     GLfloat buffers_size;
-    // ID буфера вершин
+    // ID Р±СѓС„РµСЂР° РІРµСЂС€РёРЅ
     GLuint vertexVBO;
-    // ID буфера текстурных координат
+    // ID Р±СѓС„РµСЂР° С‚РµРєСЃС‚СѓСЂРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚
     GLuint textureVBO;
-    // ID буфера нормалей
+    // ID Р±СѓС„РµСЂР° РЅРѕСЂРјР°Р»РµР№
     GLuint normalVBO;
-    // ID текстуры
+    // ID С‚РµРєСЃС‚СѓСЂС‹
     GLuint textureHandle;
 
-    // Велечина сдвига
+    // Р’РµР»РёС‡РёРЅР° СЃРґРІРёРіР°
     GLfloat shift[2];
-    GLfloat rotateBus[3] = { 0.0f, 0.0f, 0.0f };
-    GLfloat scaleBus[3] = { 1.0f, 1.0f, 1.0f };
-    GLfloat shiftBus[3] = { 0.0f, 0.0f, 0.0f };
+    GLfloat rotateObj[3] = { 0.0f, 0.0f, 0.0f };
+    GLfloat scaleObj[3] = { 1.0f, 1.0f, 1.0f };
+    GLfloat shiftObj[3] = { 0.0f, 0.0f, 0.0f };
 
     GLfloat lightPos[3] = { 0.0f, 1.0f, 0.0f };
     // View vector
@@ -57,5 +57,5 @@ struct Vertex
 {
     GLfloat x;
     GLfloat y;
-    GLfloat z; //= 0.0f;
+    GLfloat z;
 };

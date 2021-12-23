@@ -1,21 +1,18 @@
-﻿// Вращающийся треугольник с текстурой (можно вращать стрелочками)
-
-#include <gl/glew.h>
+﻿#include <gl/glew.h>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
 #include <vector>
-#include <glm/gtc/matrix_transform.hpp>
+
 #include "Polyhedron.h"
 #include "ShadeStructs.h"
 #include "Control.h"
 #include "Helpers.h"
 #include "Initialization.h"
 #include "Parser.h"
-
-
 
 float offset[3] = { 0.02, -2.74, 0.9 };
 float rotateGlob[3] = { 0.0, 0.0 ,0.0};
@@ -51,20 +48,25 @@ glm::mat4 view_projection = glm::perspective(
     4.0f / 3.0f,       // Отношение сторон. Зависит от размеров вашего окна. Заметьте, что 4/3 == 800/600 == 1280/960
     0.1f,              // Ближняя плоскость отсечения. Должна быть больше 0.
     100.0f             // Дальняя плоскость отсечения.
-) * glm::lookAt(glm::vec3(0.0f, -3.0f, 0.5f),
-    glm::vec3(0.0f, 0.0f, 2.0f),
-    glm::vec3(0.0f, 1.0f, 0.0f));
+) * glm::lookAt(
+        glm::vec3(0.0f, -3.0f, 0.5f),
+        glm::vec3(0.0f, 0.0f, 2.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f)
+);
 
 
 void Draw(GameObject gameObject, int index = 0) {
     glUseProgram(shaderInformation.shaderProgram);
+
     glUniform2fv(shaderInformation.unifShift, 1, gameObject.shift);
-    glUniform3fv(shaderInformation.unifBusRotate, 1, gameObject.rotateBus);
-    glUniform3fv(shaderInformation.unifBusScale, 1, gameObject.scaleBus);
-    glUniform3fv(shaderInformation.unifBusShift, 1, gameObject.shiftBus);
+    glUniform3fv(shaderInformation.unifBusRotate, 1, gameObject.rotateObj);
+    glUniform3fv(shaderInformation.unifBusScale, 1, gameObject.scaleObj);
+    glUniform3fv(shaderInformation.unifBusShift, 1, gameObject.shiftObj);
+
     gameObject.lightPos[0] = lightPos[0];
     gameObject.lightPos[1] = lightPos[1];
     gameObject.lightPos[2] = lightPos[2];
+
     glUniform3fv(shaderInformation.Unif_lightPos, 1, gameObject.lightPos);
     glUniform3fv(shaderInformation.Unif_eyePos, 1, gameObject.eyePos);
     glUniform1i(shaderInformation.unif_lightOn, gameObject.lightOn);
@@ -100,10 +102,8 @@ void Draw(GameObject gameObject, int index = 0) {
 
 void transform()
 {
-
     GLint s_proj = glGetUniformLocation(shaderInformation.shaderProgram, "transform.viewProjection");
     glUniformMatrix4fv(s_proj, 1, GL_FALSE, &view_projection[0][0]);
-
 }
 
 
@@ -152,16 +152,16 @@ int main() {
                 switch (event.key.code) {
                 case (sf::Keyboard::W): incRotateAxis(0); break;
                 case (sf::Keyboard::S): decRotateAxis(0); break;
-                case (sf::Keyboard::A): incRotateAxis(1); break;
-                case (sf::Keyboard::D): decRotateAxis(1); break;
-                case (sf::Keyboard::Q): incRotateAxis(2); break;
-                case (sf::Keyboard::E): decRotateAxis(2); break;
+                case (sf::Keyboard::Q): incRotateAxis(1); break;
+                case (sf::Keyboard::E): decRotateAxis(1); break;
+                case (sf::Keyboard::A): incRotateAxis(2); break;
+                case (sf::Keyboard::D): decRotateAxis(2); break;
                 case (sf::Keyboard::Left): incAxis(0); break;
                 case (sf::Keyboard::Right):  decAxis(0); break;
                 case (sf::Keyboard::Up):  incAxis(1); break;
                 case (sf::Keyboard::Down):  decAxis(1); break;
-                case (sf::Keyboard::PageUp):  decAxis(2); break;
-                case (sf::Keyboard::PageDown):  incAxis(2); break;
+                case (sf::Keyboard::Comma):  decAxis(2); break;
+                case (sf::Keyboard::Period):  incAxis(2); break;
                 case (sf::Keyboard::U): incLightPos(0); break;
                 case (sf::Keyboard::J): decLightPos(0); break;
                 case (sf::Keyboard::H): incLightPos(1); break;
@@ -179,22 +179,18 @@ int main() {
         // Отрисовываем все объекты сцены
         for (GameObject& object : gameObjects)
         {
-            gameObjects[numberOfSquares].shiftBus[0] = offset[0];
-            gameObjects[numberOfSquares].shiftBus[1] = offset[1];
-            gameObjects[numberOfSquares].shiftBus[2] = offset[2];
-            gameObjects[numberOfSquares].rotateBus[0] = rotateGlob[0];
-            gameObjects[numberOfSquares].rotateBus[1] = rotateGlob[1];
-            gameObjects[numberOfSquares].rotateBus[2] = rotateGlob[2];
+            // First <numberOfSquares> elms = road
+            // [numberOfSquares] el = bus
+            // [numberOfSquares + 1] = grass
+            /*gameObjects[numberOfSquares + 1].shiftObj[0] = offset[0];
+            gameObjects[numberOfSquares + 1].shiftObj[1] = offset[1];
+            gameObjects[numberOfSquares + 1].shiftObj[2] = offset[2];
+            gameObjects[numberOfSquares + 1].rotateObj[0] = rotateGlob[0];
+            gameObjects[numberOfSquares + 1].rotateObj[1] = rotateGlob[1];
+            gameObjects[numberOfSquares + 1].rotateObj[2] = rotateGlob[2];*/
 
-            /* gameObjects[7].shiftBus[0] = offset[0];
-             gameObjects[7].shiftBus[1] = offset[1];
-             gameObjects[7].shiftBus[2] = offset[2];
-             gameObjects[7].rotateBus[0] = rotateGlob[0];
-             gameObjects[7].rotateBus[1] = rotateGlob[1];
-             gameObjects[7].rotateBus[2] = rotateGlob[2];*/
             object.lightOn = lightOnGlobal;
             Draw(object, i++);
-            //Draw(gameObjects[6], 6);
         }
 
 
