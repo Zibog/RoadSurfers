@@ -34,6 +34,13 @@ void Release();
 void transform();
 float view_pos[]{ 0, -3, 2 };
 
+int position = 0;
+bool leftTurn = false;
+bool leftAlign = false;
+bool rightTurn = false;
+bool rightAlign = false;
+
+
 
 // Обработка шага игрового цикла
 void GameTick(int tick) {
@@ -41,6 +48,7 @@ void GameTick(int tick) {
     for (int i = 0; i < numberOfSquares; ++i)
     {
         gameObjects[i].shift[1] = 10.0f - ((tick + (frequency * i)) % (numberOfSquares * frequency)) / (float)frequency;
+        
     }
 }
 glm::mat4 view_projection = glm::perspective(
@@ -140,6 +148,83 @@ int main() {
     // Счётчик кадров
     int tickCounter = 0;
     while (window.isOpen()) {
+        if (leftTurn)
+        {
+            if (position == 0) 
+            {
+                if (offset[0]<0.3) 
+                {
+                    turnLeft();
+                }
+                else 
+                {
+                    position = -1;
+                    leftTurn = false;
+                    leftAlign = true;
+                }
+            }
+            else if (position == 1)
+            {
+                if (offset[0] < 0.0)
+                {
+                    turnLeft();
+                }
+                else
+                {
+                    position = 0;
+                    leftTurn = false;
+                    leftAlign = true;
+                }
+            } 
+        }
+        if (rightTurn)
+        {
+            if (position == 0)
+            {
+                if (offset[0] > -0.3)
+                {
+                    turnRight();
+                }
+                else
+                {
+                    position = 1;
+                    rightTurn = false;
+                    rightAlign = true;
+                }
+            }
+            else if (position == -1)
+            {
+                if (offset[0] > 0.0)
+                {
+                    turnRight();
+                }
+                else
+                {
+                    position = 0;
+                    rightTurn = false;
+                    rightAlign = true;
+                }
+            }
+        }
+        if (leftAlign) 
+        {
+            if (rotateGlob[2] < 3.14) {
+                decRotateAxis(2);
+            }
+            else 
+            {
+                leftAlign = false;
+            }
+        } else  if (rightAlign)
+        {
+            if (rotateGlob[2] >3.14) {
+                incRotateAxis(2);
+            }
+            else
+            {
+                rightAlign = false;
+            }
+        }
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -156,8 +241,18 @@ int main() {
                 case (sf::Keyboard::E): decRotateAxis(1); break;
                 case (sf::Keyboard::A): incRotateAxis(2); break;
                 case (sf::Keyboard::D): decRotateAxis(2); break;
-                case (sf::Keyboard::Left): incAxis(0); break;
-                case (sf::Keyboard::Right):  decAxis(0); break;
+                case (sf::Keyboard::Left): 
+                    if (position != -1) {
+                        leftTurn = true;
+                        rightTurn = false;
+                    }
+                    break;
+                case (sf::Keyboard::Right):
+                    if (position != 1) {
+                        rightTurn = true;
+                        leftTurn = false;
+                    }
+                    break;
                 case (sf::Keyboard::Up):  incAxis(1); break;
                 case (sf::Keyboard::Down):  decAxis(1); break;
                 case (sf::Keyboard::Comma):  decAxis(2); break;
@@ -182,12 +277,12 @@ int main() {
             // First <numberOfSquares> elms = road
             // [numberOfSquares] el = bus
             // [numberOfSquares + 1] = grass
-            /*gameObjects[numberOfSquares + 1].shiftObj[0] = offset[0];
-            gameObjects[numberOfSquares + 1].shiftObj[1] = offset[1];
-            gameObjects[numberOfSquares + 1].shiftObj[2] = offset[2];
-            gameObjects[numberOfSquares + 1].rotateObj[0] = rotateGlob[0];
-            gameObjects[numberOfSquares + 1].rotateObj[1] = rotateGlob[1];
-            gameObjects[numberOfSquares + 1].rotateObj[2] = rotateGlob[2];*/
+            gameObjects[numberOfSquares ].shiftObj[0] = offset[0];
+            gameObjects[numberOfSquares ].shiftObj[1] = offset[1];
+            gameObjects[numberOfSquares ].shiftObj[2] = offset[2];
+            gameObjects[numberOfSquares ].rotateObj[0] = rotateGlob[0];
+            gameObjects[numberOfSquares ].rotateObj[1] = rotateGlob[1];
+            gameObjects[numberOfSquares ].rotateObj[2] = rotateGlob[2];
 
             object.lightOn = lightOnGlobal;
             Draw(object, i++);

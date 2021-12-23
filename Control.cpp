@@ -6,15 +6,16 @@ extern float offset[3];
 extern float rotateGlob[3];
 extern float lightPos[3];
 
+
 void decAxis(int axis)//0x 1y 2z
 {
-    offset[axis] -= 0.5;
+    offset[axis] -= 0.01;
     cout << "inc " << axis << endl;
     cout << offset[0] << " " << offset[1] << " " << offset[2] << endl;
 }
 void incAxis(int axis)//0x 1y 2z
 {
-    offset[axis] += 0.5;
+    offset[axis] += 0.01;
     cout << "dec " << axis << endl;
     cout << offset[0] << " " << offset[1] << " " << offset[2] << endl;
 }
