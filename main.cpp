@@ -182,12 +182,12 @@ int main() {
             // First <numberOfSquares> elms = road
             // [numberOfSquares] el = bus
             // [numberOfSquares + 1] = grass
-            /*gameObjects[numberOfSquares + 1].shiftObj[0] = offset[0];
-            gameObjects[numberOfSquares + 1].shiftObj[1] = offset[1];
-            gameObjects[numberOfSquares + 1].shiftObj[2] = offset[2];
-            gameObjects[numberOfSquares + 1].rotateObj[0] = rotateGlob[0];
-            gameObjects[numberOfSquares + 1].rotateObj[1] = rotateGlob[1];
-            gameObjects[numberOfSquares + 1].rotateObj[2] = rotateGlob[2];*/
+            gameObjects[numberOfSquares ].shiftObj[0] = offset[0];
+            gameObjects[numberOfSquares ].shiftObj[1] = offset[1];
+            gameObjects[numberOfSquares ].shiftObj[2] = offset[2];
+            gameObjects[numberOfSquares ].rotateObj[0] = rotateGlob[0];
+            gameObjects[numberOfSquares ].rotateObj[1] = rotateGlob[1];
+            gameObjects[numberOfSquares ].rotateObj[2] = rotateGlob[2];
 
             object.lightOn = lightOnGlobal;
             Draw(object, i++);
