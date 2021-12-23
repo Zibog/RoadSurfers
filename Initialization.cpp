@@ -482,7 +482,7 @@ void InitCone()
             textureVBO,
             normalVBO,
             textureData.getNativeHandle(),
-            {1.0f, 1.0f},
+            {1.0f, 20.0f},
             {-1.6, 0.0f, 3.0},//-0.005 -2.36499 0.9
             { 0.08f, 0.08f, 0.08f },
             { 0.0f, -2.365f, 0.9f }
