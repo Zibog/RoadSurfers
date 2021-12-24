@@ -80,9 +80,9 @@ void Draw(GameObject gameObject, int index = 0) {
     glUseProgram(shaderInformation.shaderProgram);
 
     glUniform2fv(shaderInformation.unifShift, 1, gameObject.shift);
-    glUniform3fv(shaderInformation.unifBusRotate, 1, gameObject.rotateObj);
-    glUniform3fv(shaderInformation.unifBusScale, 1, gameObject.scaleObj);
-    glUniform3fv(shaderInformation.unifBusShift, 1, gameObject.shiftObj);
+    glUniform3fv(shaderInformation.rotation, 1, gameObject.rotateObj);
+    glUniform3fv(shaderInformation.scaling, 1, gameObject.scaleObj);
+    glUniform3fv(shaderInformation.translation, 1, gameObject.shiftObj);
 
     gameObject.lightPos[0] = lightPos[0];
     gameObject.lightPos[1] = lightPos[1];
@@ -90,7 +90,7 @@ void Draw(GameObject gameObject, int index = 0) {
 
     glUniform3fv(shaderInformation.Unif_lightPos, 1, gameObject.lightPos);
     glUniform3fv(shaderInformation.Unif_eyePos, 1, gameObject.eyePos);
-    glUniform1i(shaderInformation.unif_lightOn, gameObject.lightOn);
+    glUniform1i(shaderInformation.lightFlag, gameObject.lightOn);
     transform();
     glActiveTexture(GL_TEXTURE0);
     sf::Texture::bind(&textureDataVector[index]);

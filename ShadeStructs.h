@@ -20,9 +20,9 @@ struct ShaderInformation {
     // ID юниформа сдвига
     GLint unifShift;
 
-    GLint unifBusRotate;
-    GLint unifBusScale;
-    GLint unifBusShift;
+    GLint rotation;
+    GLint scaling;
+    GLint translation;
 
     // Light position
     GLuint Unif_lightPos;
@@ -30,7 +30,7 @@ struct ShaderInformation {
     // View std::vector
     GLuint Unif_eyePos;
     // unif lightOn
-    GLuint unif_lightOn;
+    GLuint lightFlag;
 };
 
 struct GameObject {

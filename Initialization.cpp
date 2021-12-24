@@ -158,22 +158,22 @@ void InitShader() {
         return;
     }
 
-    shaderInformation.unifBusRotate = glGetUniformLocation(shaderInformation.shaderProgram, "unifBusRotate");
-    if (shaderInformation.unifBusRotate == -1)
+    shaderInformation.rotation = glGetUniformLocation(shaderInformation.shaderProgram, "rotation");
+    if (shaderInformation.rotation == -1)
     {
         std::cout << "could not bind uniform bus angle" << std::endl;
         return;
     }
 
-    shaderInformation.unifBusScale = glGetUniformLocation(shaderInformation.shaderProgram, "unifBusScale");
-    if (shaderInformation.unifBusScale == -1)
+    shaderInformation.scaling = glGetUniformLocation(shaderInformation.shaderProgram, "scaling");
+    if (shaderInformation.scaling == -1)
     {
         std::cout << "could not bind uniform bus angle" << std::endl;
         return;
     }
 
-    shaderInformation.unifBusShift = glGetUniformLocation(shaderInformation.shaderProgram, "unifBusShift");
-    if (shaderInformation.unifBusShift == -1)
+    shaderInformation.translation = glGetUniformLocation(shaderInformation.shaderProgram, "translation");
+    if (shaderInformation.translation == -1)
     {
         std::cout << "could not bind uniform bus angle" << std::endl;
         return;
@@ -195,10 +195,10 @@ void InitShader() {
         return;
     }
 
-    shaderInformation.unif_lightOn = glGetUniformLocation(shaderInformation.shaderProgram, "unif_lightOn");
-    if (shaderInformation.unif_lightOn == -1)
+    shaderInformation.lightFlag = glGetUniformLocation(shaderInformation.shaderProgram, "lightFlag");
+    if (shaderInformation.lightFlag == -1)
     {
-        std::cout << "could not bind unif_lightOn" << std::endl;
+        std::cout << "could not bind lightFlag" << std::endl;
         return;
     }
 
