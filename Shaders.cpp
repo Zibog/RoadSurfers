@@ -45,31 +45,11 @@ void main() {
 
     vec3 position = vertCoord * aff;
 
-    vec3 newNormale = mat3(transpose(inverse(aff))) * normalCoord;
-    vec3 lposition = lightPos;
-
-    vec3 temp = lposition;
-    vec3 temp1 = eyePos;
-
-    vnormal = newNormale;
-    lightp = temp - position;
-    vnew = temp1 - position;
-
-    position = vertCoord * mat3(
-        1, 0, 0,
-        0, cos(x_angle), -sin(x_angle),
-        0, sin(x_angle), cos(x_angle)
-    ) * mat3(
-        cos(y_angle), 0, sin(y_angle),
-        0, 1, 0,
-        -sin(y_angle), 0, cos(y_angle)
-    ) * mat3(
-        cos(z_angle), -sin(z_angle), 0,
-        sin(z_angle), cos(z_angle), 0,
-        0, 0, 1
-    );
-
     tCoord = vec2(texureCoord.x, texureCoord.y);
+    vnormal = mat3(transpose(inverse(aff))) * normalCoord;
+    lightp = lightPos - position;
+    vnew = eyePos - position;
+
     vec4 position2 = vec4(position + vec3(shift, 1.0), 1.0) * mat4(
         unifBusScale.x, 0, 0, 0,
         0, unifBusScale.y, 0, 0,
@@ -80,10 +60,7 @@ void main() {
         0, 1, 0, unifBusShift.y,
         0, 0, 1, unifBusShift.z,
         0, 0, 0, 1
-    );;
-    // TODO: remove lightPos and eyePos;
-    gl_Position = vec4(normalCoord, 1.0f);
-    if (unif_lightOn) { gl_Position = vec4(normalCoord, 1.0f); }
+    );
     gl_Position = transform.viewProjection * position2;
 }
 );
@@ -101,8 +78,6 @@ out vec4 color;
 
 const vec4 diffColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
 const vec4 specColor = vec4(0.7f, 0.7f, 0.7f, 1.0f);
-//const vec4  diffColor = vec4(0.5, 0.0, 0.0, 1.0);
-//const vec4  specColor = vec4(0.7, 0.7, 0.0, 1.0);
 const float specPower = 30.0f;
 
 void main() {
@@ -113,7 +88,7 @@ void main() {
     vec4 diff = diffColor * max(dot(n2, l2), 0.0f);
     vec4 spec = specColor * pow(max(dot(l2, r), 0.0f), specPower);
 
-    color = texture(textureData, tCoord) + (diff + spec);
-    if (!unif_lightOn) { color = color * 0.4f; }
+    color = texture(textureData, tCoord);
+    if (unif_lightOn) { color = color + (diff + spec); }
 }
 );

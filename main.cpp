@@ -18,7 +18,7 @@
 
 float offset[3] = { 0.02, -2.74, 0.9 };
 float rotateGlob[3] = { 0.0, 0.0 ,0.0};
-float lightPos[3] = { 3.0f, 0.0f, 0.0f };
+float lightPos[3] = { 3.0f, 0.0f, 0.0f };//6.69062e-07 -0.5 0
 GLboolean lightOnGlobal = true;
 
 sf::Texture textureData;
@@ -55,7 +55,9 @@ void GameTick(int tick) {
     for (int i = numberOfSquares+2; i < gameObjects.size(); ++i)
     {
         gameObjects[i].shift[1] -= 0.1;
-        if (gameObjects[i].shift[1] < -10) {
+
+        if (gameObjects[i].shift[1] < -10) 
+        {
             gameObjects[i].shift[1] += 40;
             int r = std::rand() % 3 - 1;
             gameObjects[i].shift[0] = r * 4.5f + 1.0f;
