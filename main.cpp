@@ -249,32 +249,32 @@ int main() {
             }
             else if (event.type == sf::Event::KeyPressed) {
                 switch (event.key.code) {
-                case (sf::Keyboard::W): incRotateAxis(0); break;
+                /*case (sf::Keyboard::W): incRotateAxis(0); break;
                 case (sf::Keyboard::S): decRotateAxis(0); break;
                 case (sf::Keyboard::Q): incRotateAxis(1); break;
                 case (sf::Keyboard::E): decRotateAxis(1); break;
                 case (sf::Keyboard::A): incRotateAxis(2); break;
-                case (sf::Keyboard::D): decRotateAxis(2); break;
-                case (sf::Keyboard::Left): 
+                case (sf::Keyboard::D): decRotateAxis(2); break;*/
+                case (sf::Keyboard::A): 
                     if (position != -1) {
                         leftTurn = true;
                         rightTurn = false;
                     }
                     break;
-                case (sf::Keyboard::Right):
+                case (sf::Keyboard::D):
                     if (position != 1) {
                         rightTurn = true;
                         leftTurn = false;
                     }
                     break;
-                case (sf::Keyboard::Up):  incAxis(1); break;
+                /*case (sf::Keyboard::Up):  incAxis(1); break;
                 case (sf::Keyboard::Down):  decAxis(1); break;
                 case (sf::Keyboard::Comma):  decAxis(2); break;
-                case (sf::Keyboard::Period):  incAxis(2); break;
-                case (sf::Keyboard::U): incLightPos(0); break;
-                case (sf::Keyboard::J): decLightPos(0); break;
-                case (sf::Keyboard::H): incLightPos(1); break;
-                case (sf::Keyboard::K): decLightPos(1); break;
+                case (sf::Keyboard::Period):  incAxis(2); break;*/
+                case (sf::Keyboard::J): incLightPos(1); break;
+                case (sf::Keyboard::U): decLightPos(1); break;
+                case (sf::Keyboard::K): incLightPos(0); break;
+                case (sf::Keyboard::H): decLightPos(0); break;
                 case (sf::Keyboard::L):  lightOnGlobal = !lightOnGlobal; break;
                 default: break;
                 }
