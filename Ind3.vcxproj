@@ -31,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Control.h" />
+    <ClInclude Include="FigureModel.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Initialization.h" />
     <ClInclude Include="Parser.h" />

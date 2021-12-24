@@ -6,6 +6,7 @@
 #include "Helpers.h"
 #include "Polyhedron.h"
 #include "Parser.h"
+#include "FigureModel.h"
 
 using namespace std;
 
@@ -79,7 +80,7 @@ void InitRoad()
     // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
     for (int i = 0; i < numberOfSquares; ++i)
     {
-        const char* filename = "model/road.png";
+        const string filename = "model/road.png";
         textureData.loadFromFile(filename);
         gameObjects.push_back(GameObject{
                 6,  // количество вершин в каждом буфере
@@ -205,7 +206,7 @@ void InitShader() {
     checkOpenGLerror();
 }
 
-int InitVBO(Polyhedron& pol, GLuint &vertexVBO, GLuint &textureVBO, GLuint &normalVBO)
+int InitVBO(figure_model & fm, GLuint &vertexVBO, GLuint &textureVBO, GLuint &normalVBO)
 {
     
     glGenBuffers(1, &vertexVBO);
@@ -214,58 +215,16 @@ int InitVBO(Polyhedron& pol, GLuint &vertexVBO, GLuint &textureVBO, GLuint &norm
     VBOArray.push_back(vertexVBO);
     VBOArray.push_back(textureVBO);
     VBOArray.push_back(normalVBO);
-
-    vector<float> busCenter;
-    busCenter.push_back(1.0);
-    busCenter.push_back(0.0);
-    busCenter.push_back(0.0);
-
     rotateGlob[0] = -1.66;
     rotateGlob[2] = 3.14;
-
-    vector<vector<float>> vv;
-    for (Triangle tr : pol.polygons)
-    {
-        for (int i = 0; i <= 2; i++)
-        {
-            vv.push_back({
-                tr.points[i].x + busCenter[0],
-                tr.points[i].y + busCenter[1],
-                tr.points[i].z + busCenter[2] ,
-                tr.texture[i].u,
-                tr.texture[i].v,
-                tr.normal[i].x,
-                tr.normal[i].y,
-                tr.normal[i].z });
-        }
-    }
-
-    // структура: вершина(3) текстура(2) нормаль(3) цвет(3)
-    int size = vv.size();
-    Vertex* pointsCoord = new Vertex[size];
-    for (int i = 0; i < size; i++)
-    {
-        pointsCoord[i] = { vv[i][0], vv[i][1], vv[i][2] };
-    }
-
-    Vertex* pointsTexture = new Vertex[size];
-    for (int i = 0; i < size; i++)
-    {
-        pointsTexture[i] = { vv[i][3], vv[i][4] };
-    }
-
-    Vertex* pointsNormals = new Vertex[size];
-    for (int i = 0; i < size; i++)
-    {
-        pointsNormals[i] = { vv[i][5], vv[i][6], vv[i][7] };
-    }
+    size_t size = fm.count();
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsCoord, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), fm.get_vertices().data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
-    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsTexture, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), fm.get_texture().data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
-    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), pointsNormals, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size * 3 * sizeof(GLfloat), fm.get_normals().data(), GL_STATIC_DRAW);
 
     checkOpenGLerror();
     return size;
@@ -273,13 +232,14 @@ int InitVBO(Polyhedron& pol, GLuint &vertexVBO, GLuint &textureVBO, GLuint &norm
 
 void InitBus()
 {
-    Polyhedron pol;
-    parseObjFile(pol, "model/bus2.obj");
+    const string objFilename = "model/bus2.obj";
+    const string filename = "model/bus2.png";
+    figure_model fm(objFilename);
     GLuint vertexVBO;
     GLuint textureVBO;
     GLuint normalVBO;
-    int size = InitVBO(pol, vertexVBO, textureVBO, normalVBO);
-    const char* filename = "model/bus2.png";
+    int size = InitVBO(fm, vertexVBO, textureVBO, normalVBO);
+    
     textureData.loadFromFile(filename);
     textureDataVector.push_back(textureData);
     // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
@@ -301,13 +261,14 @@ void InitBus()
 
 void InitGrass()
 {
-    Polyhedron pol;
-    parseObjFile(pol, "model/grass.obj");
+    const string objFilename = "model/grass.obj";
+    const string filename = "model/grass.png";
+    figure_model fm(objFilename);
     GLuint vertexVBO;
     GLuint textureVBO;
     GLuint normalVBO;
-    int size = InitVBO(pol, vertexVBO, textureVBO, normalVBO);
-    const char* filename = "model/grass.png";
+    int size = InitVBO(fm, vertexVBO, textureVBO, normalVBO);
+    
     textureData.loadFromFile(filename);
     textureDataVector.push_back(textureData);
     // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
@@ -330,13 +291,13 @@ void InitGrass()
 
 void InitCone(int ind)
 {
-    Polyhedron pol;
-    parseObjFile(pol, "model/cone.obj");
+    const string objFilename = "model/cone.obj";
+    const string filename = "model/cone.png";
+    figure_model fm(objFilename);
     GLuint vertexVBO;
     GLuint textureVBO;
     GLuint normalVBO;
-    int size = InitVBO(pol, vertexVBO, textureVBO, normalVBO);
-    const char* filename = "model/cone.png";
+    int size = InitVBO(fm, vertexVBO, textureVBO, normalVBO);
     textureData.loadFromFile(filename);
     textureDataVector.push_back(textureData);
     int r = std::rand() % 3 - 1;
