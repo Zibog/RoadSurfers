@@ -280,9 +280,9 @@ void InitGrass()
             normalVBO,
             textureData.getNativeHandle(),
             {1.0f, 1.0f},
-            {-1.6, -0.17f, 3.93},
+            {-1.54, -0.2f, -0.17},
             { 1.0f, 1.0f, 1.0f },
-            { 0.02f, -19.74f, 18.9f }
+            { 1.02f, 0.26f, 19.9f }
             
         }
     ); 
