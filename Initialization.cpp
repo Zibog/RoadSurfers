@@ -4,7 +4,6 @@
 #include <ctime>
 #include "ShadeStructs.h"
 #include "Helpers.h"
-#include "Polyhedron.h"
 #include "Parser.h"
 #include "FigureModel.h"
 

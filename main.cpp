@@ -9,12 +9,13 @@
 #include <ctime>
 #include <vector>
 
-#include "Polyhedron.h"
 #include "ShadeStructs.h"
 #include "Control.h"
 #include "Helpers.h"
 #include "Initialization.h"
 #include "Parser.h"
+
+using namespace std;
 
 float offset[3] = { 0.02, -2.74, 0.9 };
 float rotateGlob[3] = { 0.0, 0.0 ,0.0};
@@ -29,7 +30,6 @@ ShaderInformation shaderInformation;
 std::vector <GLuint> VBOArray;
 
 int numberOfSquares = 50;
-Polyhedron polyhedron;
 void GameTick(int tick);
 void Draw(GameObject gameObject, int i);
 void Release();
@@ -149,7 +149,6 @@ void Release() {
 
 int main() {
     std::srand(std::time(nullptr));
-    parseObjFile(polyhedron, "model/bus2.obj");
     sf::Window window(sf::VideoMode(600, 600), "Subway Surf", sf::Style::Default, sf::ContextSettings(24));
     window.setVerticalSyncEnabled(true);
 
