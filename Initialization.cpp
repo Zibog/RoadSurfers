@@ -86,7 +86,7 @@ void InitRoad()
                 vertexVBO,
                 textureVBO,
                 normalVBO,
-                textureData.getNativeHandle(), {0, 0}});
+                textureData.getNativeHandle(), {0, -2.5f+1.0f*i}});
 
         textureDataVector.push_back(textureData);
     }

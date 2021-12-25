@@ -19,7 +19,7 @@ using namespace std;
 
 float offset[3] = { 0.02, -2.74, 0.9 };
 float rotateGlob[3] = { 0.0, 0.0 ,0.0};
-float lightPos[3] = { 3.0f, 0.0f, 0.0f };
+float lightPos[3] = { -13.0f, 0.0f, 0.0f };
 GLboolean lightOnGlobal = true;
 
 sf::Texture textureData;
@@ -29,7 +29,7 @@ ShaderInformation shaderInformation;
 // Массив VBO что бы их потом удалить
 std::vector <GLuint> VBOArray;
 
-int numberOfSquares = 50;
+int numberOfSquares = 20;
 void GameTick(int tick);
 void Draw(GameObject gameObject, int i);
 void Release();
@@ -49,7 +49,11 @@ void GameTick(int tick) {
     int frequency = 100;
     for (int i = 0; i < numberOfSquares; ++i)
     {
-        gameObjects[i].shift[1] = 10.0f - ((tick + (frequency * i)) % (numberOfSquares * frequency)) / (float)frequency;
+        gameObjects[i].shift[1] -=0.01;
+        if (gameObjects[i].shift[1] < -10) {
+            gameObjects[i].shift[1] += numberOfSquares;
+            
+        }
     
     }
     for (int i = numberOfSquares+2; i < gameObjects.size(); ++i)

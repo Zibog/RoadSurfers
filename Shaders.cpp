@@ -104,6 +104,11 @@ void main() {
     vec4 spec = specColor * pow(max(dot(l2, r), 0.0f), specPower);
 
     color = texture(textureData, tCoord) + (diff + spec);
-    if (!lightFlag) { color = color * 0.4f; }
+    if (lightFlag) {
+        color = texture(textureData, tCoord) + (diff + spec);
+    }
+    else {
+        color = texture(textureData, tCoord) + (diff + spec)*0;
+    }
 }
 );
