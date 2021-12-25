@@ -30,21 +30,13 @@ ShaderData shaderInformation;
 std::vector <GLuint> VBOArray;
 
 int roadCount = 50;
-void GameTick(int tick);
-void Draw(GameObject gameObject, int i);
-void Release();
-void transform();
+
 float view_pos[]{ 0, -5, 2 };
 
-int position = 0;
-bool leftTurn = false;
-bool leftAlign = false;
-bool rightTurn = false;
-bool rightAlign = false;
 
 
 
-// Обработка шага игрового цикла
+
 void GameTick(int tick) {
    
 
@@ -72,10 +64,10 @@ void GameTick(int tick) {
     
 }
 glm::mat4 view_projection = glm::perspective(
-    glm::radians(90.0f), // Вертикальное поле зрения в радианах. Обычно между 90&deg; (очень широкое) и 30&deg; (узкое)
-    4.0f / 3.0f,       // Отношение сторон. Зависит от размеров вашего окна. Заметьте, что 4/3 == 800/600 == 1280/960
-    0.1f,              // Ближняя плоскость отсечения. Должна быть больше 0.
-    100.0f             // Дальняя плоскость отсечения.
+    glm::radians(90.0f),
+    4.0f / 3.0f,      
+    0.1f,              
+    100.0f             
 ) * glm::lookAt(
         glm::vec3(0.0f, -3.0f, 0.5f),
         glm::vec3(0.0f, 0.0f, 2.0f),
@@ -83,25 +75,40 @@ glm::mat4 view_projection = glm::perspective(
 );
 
 
+void Release() {
+    glUseProgram(0);
+    glDeleteProgram(shaderInformation.shaderProgram);
+    glUseProgram(0);
+    glDeleteProgram(shaderInformation.shaderProgram);
+}
+
+
+
+
 void Draw(GameObject gameObject, int index = 0) {
     glUseProgram(shaderInformation.shaderProgram);
-
     glUniform2fv(shaderInformation.unifShift, 1, gameObject.shift);
     glUniform3fv(shaderInformation.rotation, 1, gameObject.rotation);
     glUniform3fv(shaderInformation.scaling, 1, gameObject.scaling);
     glUniform3fv(shaderInformation.translation, 1, gameObject.translation);
-
     gameObject.lightPos[0] = lightPos[0];
     gameObject.lightPos[1] = lightPos[1];
     gameObject.lightPos[2] = lightPos[2];
-
     glUniform3fv(shaderInformation.lightPosition, 1, gameObject.lightPos);
     glUniform3fv(shaderInformation.eyePosition, 1, gameObject.eyePos);
     glUniform1i(shaderInformation.lightFlag, gameObject.lightOn);
-    transform();
+
+
+    
+    GLint s_proj = glGetUniformLocation(shaderInformation.shaderProgram, "transform.viewProjection");
+    glUniformMatrix4fv(s_proj, 1, GL_FALSE, &view_projection[0][0]);
+
+
     glActiveTexture(GL_TEXTURE0);
     sf::Texture::bind(&textureDataVector[index]);
     glUniform1i(shaderInformation.unifTexture, 0);
+
+
 
     // Подключаем VBO
     glEnableVertexAttribArray(shaderInformation.attribVertex);
@@ -128,115 +135,10 @@ void Draw(GameObject gameObject, int index = 0) {
     checkOpenGLerror();
 }
 
-void transform()
-{
-    GLint s_proj = glGetUniformLocation(shaderInformation.shaderProgram, "transform.viewProjection");
-    glUniformMatrix4fv(s_proj, 1, GL_FALSE, &view_projection[0][0]);
-}
-
-
-void ReleaseShader() {
-    glUseProgram(0);
-    glDeleteProgram(shaderInformation.shaderProgram);
-}
-
-void ReleaseVBO()
-{
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    for (GLuint VBO : VBOArray)
-        glDeleteBuffers(1, &VBO);
-}
-
-void Release() {
-    ReleaseShader();
-    ReleaseVBO();
-}
-
-
-void makeMovement() {
-    if (leftTurn)
-    {
-        if (position == 0)
-        {
-            if (offset[0] < 0.3)
-            {
-                turnLeft();
-            }
-            else
-            {
-                position = -1;
-                leftTurn = false;
-                leftAlign = true;
-            }
-        }
-        else if (position == 1)
-        {
-            if (offset[0] < 0.0)
-            {
-                turnLeft();
-            }
-            else
-            {
-                position = 0;
-                leftTurn = false;
-                leftAlign = true;
-            }
-        }
-    }
-    if (rightTurn)
-    {
-        if (position == 0)
-        {
-            if (offset[0] > -0.3)
-            {
-                turnRight();
-            }
-            else
-            {
-                position = 1;
-                rightTurn = false;
-                rightAlign = true;
-            }
-        }
-        else if (position == -1)
-        {
-            if (offset[0] > 0.0)
-            {
-                turnRight();
-            }
-            else
-            {
-                position = 0;
-                rightTurn = false;
-                rightAlign = true;
-            }
-        }
-    }
-    if (leftAlign)
-    {
-        if (rotateGlob[2] < 3.14) {
-            decRotateAxis(2);
-        }
-        else
-        {
-            leftAlign = false;
-        }
-    }
-    else  if (rightAlign)
-    {
-        if (rotateGlob[2] > 3.14) {
-            incRotateAxis(2);
-        }
-        else
-        {
-            rightAlign = false;
-        }
-    }
-}
-
-
 int main() {
     std::srand(std::time(nullptr));
+
+
     sf::Window window(sf::VideoMode(600, 600), "Subway Surf", sf::Style::Default, sf::ContextSettings(24));
     window.setVerticalSyncEnabled(true);
 
@@ -260,32 +162,14 @@ int main() {
             }
             else if (event.type == sf::Event::KeyPressed) {
                 switch (event.key.code) {
-                case (sf::Keyboard::W): incRotateAxis(0); break;
-                case (sf::Keyboard::S): decRotateAxis(0); break;
-                case (sf::Keyboard::Q): incRotateAxis(1); break;
-                case (sf::Keyboard::E): decRotateAxis(1); break;
-                case (sf::Keyboard::A): incRotateAxis(2); break;
-                case (sf::Keyboard::D): decRotateAxis(2); break;
                 case (sf::Keyboard::Left): 
-                    if (position != -1) {
-                        leftTurn = true;
-                        rightTurn = false;
-                    }
+                    moveLeft();
                     break;
                 case (sf::Keyboard::Right):
-                    if (position != 1) {
-                        rightTurn = true;
-                        leftTurn = false;
-                    }
+                    moveRight();
                     break;
                 case (sf::Keyboard::Up):  incAxis(1); break;
                 case (sf::Keyboard::Down):  decAxis(1); break;
-                case (sf::Keyboard::Comma):  decAxis(2); break;
-                case (sf::Keyboard::Period):  incAxis(2); break;
-                case (sf::Keyboard::U): incLightPos(0); break;
-                case (sf::Keyboard::J): decLightPos(0); break;
-                case (sf::Keyboard::H): incLightPos(1); break;
-                case (sf::Keyboard::K): decLightPos(1); break;
                 case (sf::Keyboard::L):  lightOnGlobal = !lightOnGlobal; break;
                 default: break;
                 }

@@ -319,6 +319,36 @@ void InitCone(int ind)
     );
 }
 
+void InitBox(int ind)
+{
+    const string objFilename = "model/box.obj";
+    const string filename = "model/box.png";
+    figure_model fm(objFilename);
+    GLuint vertexVBO;
+    GLuint textureVBO;
+    GLuint normalVBO;
+    int size = InitVBO(fm, vertexVBO, textureVBO, normalVBO);
+    textureData.loadFromFile(filename);
+    textureDataVector.push_back(textureData);
+    int r = std::rand() % 3 - 1;
+    // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
+    gameObjects.push_back(
+        GameObject
+        {
+            (GLfloat)size,  // количество вершин в каждом буфере
+            vertexVBO,
+            textureVBO,
+            normalVBO,
+            textureData.getNativeHandle(),
+            {1.0f + r * 4.5f, (ind + 1) * 10.0f+30.0f},
+            {-1.6, 0.0f, 3.0},//-0.005 -2.36499 0.9
+            { 0.08f, 0.08f, 0.08f },
+            { 0.0f, -2.365f, 0.9f }
+        }
+    );
+}
+
+
 void Init() {
     InitShader();
     InitRoad();
@@ -326,6 +356,9 @@ void Init() {
     InitGrass();
     for (int i = 0; i < 3; i++) {
         InitCone(i);
+    }
+    for (int i = 0; i < 3; i++) {
+        InitBox(i);
     }
     glEnable(GL_DEPTH_TEST);
 }

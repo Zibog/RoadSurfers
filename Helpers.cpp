@@ -9,6 +9,8 @@ void checkOpenGLerror() {
         std::cout << "OpenGl error!: " << errCode << std::endl;
 }
 
+
+
 void ShaderLog(unsigned int shader)
 {
     int infologLen = 0;

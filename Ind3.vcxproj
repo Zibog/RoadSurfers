@@ -29,10 +29,12 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BusState.h" />
     <ClInclude Include="Control.h" />
     <ClInclude Include="FigureModel.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Initialization.h" />
+    <ClInclude Include="TextureData.h" />
     <ClInclude Include="ShadeStructs.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -51,3 +51,103 @@ void incLightPos(int axis)//0x 1y 2z
     cout << lightPos[0] << " " << lightPos[1] << " " << lightPos[2] << endl;
 }
 
+int position = 0;
+bool leftTurn = false;
+bool leftAlign = false;
+bool rightTurn = false;
+bool rightAlign = false;
+
+void makeMovement() {
+    if (leftTurn)
+    {
+        if (position == 0)
+        {
+            if (offset[0] < 0.3)
+            {
+                turnLeft();
+            }
+            else
+            {
+                position = -1;
+                leftTurn = false;
+                leftAlign = true;
+            }
+        }
+        else if (position == 1)
+        {
+            if (offset[0] < 0.0)
+            {
+                turnLeft();
+            }
+            else
+            {
+                position = 0;
+                leftTurn = false;
+                leftAlign = true;
+            }
+        }
+    }
+    if (rightTurn)
+    {
+        if (position == 0)
+        {
+            if (offset[0] > -0.3)
+            {
+                turnRight();
+            }
+            else
+            {
+                position = 1;
+                rightTurn = false;
+                rightAlign = true;
+            }
+        }
+        else if (position == -1)
+        {
+            if (offset[0] > 0.0)
+            {
+                turnRight();
+            }
+            else
+            {
+                position = 0;
+                rightTurn = false;
+                rightAlign = true;
+            }
+        }
+    }
+    if (leftAlign)
+    {
+        if (rotateGlob[2] < 3.14) {
+            decRotateAxis(2);
+        }
+        else
+        {
+            leftAlign = false;
+        }
+    }
+    else  if (rightAlign)
+    {
+        if (rotateGlob[2] > 3.14) {
+            incRotateAxis(2);
+        }
+        else
+        {
+            rightAlign = false;
+        }
+    }
+}
+
+void moveLeft() {
+    if (position != -1) {
+        leftTurn = true;
+        rightTurn = false;
+    }
+}
+
+void moveRight() {
+    if (position != 1) {
+        rightTurn = true;
+        leftTurn = false;
+    }
+}

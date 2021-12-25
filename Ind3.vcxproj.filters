@@ -50,5 +50,11 @@
     <ClInclude Include="FigureModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BusState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
