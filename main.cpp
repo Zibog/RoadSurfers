@@ -25,16 +25,16 @@ GLboolean lightOnGlobal = true;
 sf::Texture textureData;
 vector<sf::Texture> textureDataVector;
 std::vector <GameObject> gameObjects;
-ShaderInformation shaderInformation;
+ShaderData shaderInformation;
 // Массив VBO что бы их потом удалить
 std::vector <GLuint> VBOArray;
 
-int numberOfSquares = 20;
+int roadCount = 50;
 void GameTick(int tick);
 void Draw(GameObject gameObject, int i);
 void Release();
 void transform();
-float view_pos[]{ 0, -3, 2 };
+float view_pos[]{ 0, -5, 2 };
 
 int position = 0;
 bool leftTurn = false;
@@ -46,17 +46,9 @@ bool rightAlign = false;
 
 // Обработка шага игрового цикла
 void GameTick(int tick) {
-    int frequency = 100;
-    for (int i = 0; i < numberOfSquares; ++i)
-    {
-        gameObjects[i].shift[1] -=0.01;
-        if (gameObjects[i].shift[1] < -10) {
-            gameObjects[i].shift[1] += numberOfSquares;
-            
-        }
-    
-    }
-    for (int i = numberOfSquares+2; i < gameObjects.size(); ++i)
+   
+
+    for (int i = roadCount + 2; i < gameObjects.size(); ++i)
     {
         gameObjects[i].shift[1] -= 0.1;
         if (gameObjects[i].shift[1] < -10) {
@@ -66,6 +58,17 @@ void GameTick(int tick) {
         }
 
     }
+
+    for (int i = 0; i < roadCount; ++i)
+    {
+        gameObjects[i].shift[1] -=0.01;
+        if (gameObjects[i].shift[1] < -10) {
+            gameObjects[i].shift[1] += roadCount;
+            
+        }
+    }
+    gameObjects[roadCount+1].shift[1] -= 0.01;
+
     
 }
 glm::mat4 view_projection = glm::perspective(
@@ -84,16 +87,16 @@ void Draw(GameObject gameObject, int index = 0) {
     glUseProgram(shaderInformation.shaderProgram);
 
     glUniform2fv(shaderInformation.unifShift, 1, gameObject.shift);
-    glUniform3fv(shaderInformation.rotation, 1, gameObject.rotateObj);
-    glUniform3fv(shaderInformation.scaling, 1, gameObject.scaleObj);
-    glUniform3fv(shaderInformation.translation, 1, gameObject.shiftObj);
+    glUniform3fv(shaderInformation.rotation, 1, gameObject.rotation);
+    glUniform3fv(shaderInformation.scaling, 1, gameObject.scaling);
+    glUniform3fv(shaderInformation.translation, 1, gameObject.translation);
 
     gameObject.lightPos[0] = lightPos[0];
     gameObject.lightPos[1] = lightPos[1];
     gameObject.lightPos[2] = lightPos[2];
 
-    glUniform3fv(shaderInformation.Unif_lightPos, 1, gameObject.lightPos);
-    glUniform3fv(shaderInformation.Unif_eyePos, 1, gameObject.eyePos);
+    glUniform3fv(shaderInformation.lightPosition, 1, gameObject.lightPos);
+    glUniform3fv(shaderInformation.eyePosition, 1, gameObject.eyePos);
     glUniform1i(shaderInformation.lightFlag, gameObject.lightOn);
     transform();
     glActiveTexture(GL_TEXTURE0);
@@ -140,7 +143,6 @@ void ReleaseShader() {
 void ReleaseVBO()
 {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // Чистим все выделенные VBO
     for (GLuint VBO : VBOArray)
         glDeleteBuffers(1, &VBO);
 }
@@ -148,6 +150,88 @@ void ReleaseVBO()
 void Release() {
     ReleaseShader();
     ReleaseVBO();
+}
+
+
+void makeMovement() {
+    if (leftTurn)
+    {
+        if (position == 0)
+        {
+            if (offset[0] < 0.3)
+            {
+                turnLeft();
+            }
+            else
+            {
+                position = -1;
+                leftTurn = false;
+                leftAlign = true;
+            }
+        }
+        else if (position == 1)
+        {
+            if (offset[0] < 0.0)
+            {
+                turnLeft();
+            }
+            else
+            {
+                position = 0;
+                leftTurn = false;
+                leftAlign = true;
+            }
+        }
+    }
+    if (rightTurn)
+    {
+        if (position == 0)
+        {
+            if (offset[0] > -0.3)
+            {
+                turnRight();
+            }
+            else
+            {
+                position = 1;
+                rightTurn = false;
+                rightAlign = true;
+            }
+        }
+        else if (position == -1)
+        {
+            if (offset[0] > 0.0)
+            {
+                turnRight();
+            }
+            else
+            {
+                position = 0;
+                rightTurn = false;
+                rightAlign = true;
+            }
+        }
+    }
+    if (leftAlign)
+    {
+        if (rotateGlob[2] < 3.14) {
+            decRotateAxis(2);
+        }
+        else
+        {
+            leftAlign = false;
+        }
+    }
+    else  if (rightAlign)
+    {
+        if (rotateGlob[2] > 3.14) {
+            incRotateAxis(2);
+        }
+        else
+        {
+            rightAlign = false;
+        }
+    }
 }
 
 
@@ -165,83 +249,7 @@ int main() {
     // Счётчик кадров
     int tickCounter = 0;
     while (window.isOpen()) {
-        if (leftTurn)
-        {
-            if (position == 0) 
-            {
-                if (offset[0]<0.3) 
-                {
-                    turnLeft();
-                }
-                else 
-                {
-                    position = -1;
-                    leftTurn = false;
-                    leftAlign = true;
-                }
-            }
-            else if (position == 1)
-            {
-                if (offset[0] < 0.0)
-                {
-                    turnLeft();
-                }
-                else
-                {
-                    position = 0;
-                    leftTurn = false;
-                    leftAlign = true;
-                }
-            } 
-        }
-        if (rightTurn)
-        {
-            if (position == 0)
-            {
-                if (offset[0] > -0.3)
-                {
-                    turnRight();
-                }
-                else
-                {
-                    position = 1;
-                    rightTurn = false;
-                    rightAlign = true;
-                }
-            }
-            else if (position == -1)
-            {
-                if (offset[0] > 0.0)
-                {
-                    turnRight();
-                }
-                else
-                {
-                    position = 0;
-                    rightTurn = false;
-                    rightAlign = true;
-                }
-            }
-        }
-        if (leftAlign) 
-        {
-            if (rotateGlob[2] < 3.14) {
-                decRotateAxis(2);
-            }
-            else 
-            {
-                leftAlign = false;
-            }
-        } else  if (rightAlign)
-        {
-            if (rotateGlob[2] >3.14) {
-                incRotateAxis(2);
-            }
-            else
-            {
-                rightAlign = false;
-            }
-        }
+        makeMovement();
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -291,15 +299,12 @@ int main() {
         // Отрисовываем все объекты сцены
         for (GameObject& object : gameObjects)
         {
-            // First <numberOfSquares> elms = road
-            // [numberOfSquares] el = bus
-            // [numberOfSquares + 1] = grass
-            gameObjects[numberOfSquares ].shiftObj[0] = offset[0];
-            gameObjects[numberOfSquares ].shiftObj[1] = offset[1];
-            gameObjects[numberOfSquares ].shiftObj[2] = offset[2];
-            gameObjects[numberOfSquares ].rotateObj[0] = rotateGlob[0];
-            gameObjects[numberOfSquares ].rotateObj[1] = rotateGlob[1];
-            gameObjects[numberOfSquares ].rotateObj[2] = rotateGlob[2];
+            gameObjects[roadCount ].translation[0] = offset[0];
+            gameObjects[roadCount ].translation[1] = offset[1];
+            gameObjects[roadCount ].translation[2] = offset[2];
+            gameObjects[roadCount ].rotation[0] = rotateGlob[0];
+            gameObjects[roadCount ].rotation[1] = rotateGlob[1];
+            gameObjects[roadCount ].rotation[2] = rotateGlob[2];
 
             object.lightOn = lightOnGlobal;
             Draw(object, i++);

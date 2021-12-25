@@ -13,85 +13,17 @@ extern GLboolean lightOnGlobal;
 extern sf::Texture textureData;
 extern vector<sf::Texture> textureDataVector;
 extern std::vector <GameObject> gameObjects;
-extern ShaderInformation shaderInformation;
+extern ShaderData shaderInformation;
 // Массив VBO что бы их потом удалить
 extern std::vector <GLuint> VBOArray;
-extern int  numberOfSquares;
+extern int  roadCount;
 extern float rotateGlob[3];
 
 extern const char* VertexShaderSource;
 extern const char* FragShaderSource;
 
 
-void InitRoad()
-{
-    GLuint vertexVBO;
-    GLuint textureVBO;
-    GLuint normalVBO;
-    glGenBuffers(1, &vertexVBO);
-    glGenBuffers(1, &textureVBO);
-    glGenBuffers(1, &normalVBO);
-    VBOArray.push_back(vertexVBO);
-    VBOArray.push_back(textureVBO);
-    VBOArray.push_back(normalVBO);
 
-    // Объявляем вершины треугольника
-    Vertex triangle[] = {
-        { -0.5f, -0.5f, 0.0f },
-        { +0.5f, -0.5f, 0.0f },
-        { +0.5f, +0.5f, 0.0f },
-
-        { +0.5f, +0.5f, 0.0f },
-        { -0.5f, +0.5f, 0.0f },
-        { -0.5f, -0.5f, 0.0f },
-    };
-
-    // Объявляем текстурные координаты
-    Vertex texture[] = {
-        { 0.0f, 1.0f },
-        { 1.0f, 1.0f },
-        { 1.0f, 0.0f },
-
-        { 1.0f, 0.0f },
-        { 0.0f, 0.0f },
-        { 0.0f, 1.0f  },
-    };
-
-    Vertex normal[] = {
-        { 0.0f, 1.0f, 0.0f },
-        { 0.0f, 1.0f, 0.0f },
-        { 0.0f, 1.0f, 0.0f },
-
-        { 0.0f, 1.0f, 0.0f },
-        { 0.0f, 1.0f, 0.0f },
-        { 0.0f, 1.0f, 0.0f },
-    };
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(texture), texture, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(normal), normal, GL_STATIC_DRAW);
-
-    checkOpenGLerror();
-
-    // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
-    for (int i = 0; i < numberOfSquares; ++i)
-    {
-        const string filename = "model/road.png";
-        textureData.loadFromFile(filename);
-        gameObjects.push_back(GameObject{
-                6,  // количество вершин в каждом буфере
-                vertexVBO,
-                textureVBO,
-                normalVBO,
-                textureData.getNativeHandle(), {0, -2.5f+1.0f*i}});
-
-        textureDataVector.push_back(textureData);
-    }
-
-}
 
 void InitShader() {
     GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
@@ -180,16 +112,16 @@ void InitShader() {
     }
 
     const char* unif_name = "lightPos";
-    shaderInformation.Unif_lightPos = glGetUniformLocation(shaderInformation.shaderProgram, unif_name);
-    if (shaderInformation.Unif_lightPos == -1)
+    shaderInformation.lightPosition = glGetUniformLocation(shaderInformation.shaderProgram, unif_name);
+    if (shaderInformation.lightPosition == -1)
     {
         std::cout << "could not bind uniform " << unif_name << std::endl;
         return;
     }
 
     unif_name = "eyePos";
-    shaderInformation.Unif_eyePos = glGetUniformLocation(shaderInformation.shaderProgram, unif_name);
-    if (shaderInformation.Unif_eyePos == -1)
+    shaderInformation.eyePosition = glGetUniformLocation(shaderInformation.shaderProgram, unif_name);
+    if (shaderInformation.eyePosition == -1)
     {
         std::cout << "could not bind uniform " << unif_name << std::endl;
         return;
@@ -203,6 +135,76 @@ void InitShader() {
     }
 
     checkOpenGLerror();
+}
+
+void InitRoad()
+{
+    GLuint vertexVBO;
+    GLuint textureVBO;
+    GLuint normalVBO;
+    glGenBuffers(1, &vertexVBO);
+    glGenBuffers(1, &textureVBO);
+    glGenBuffers(1, &normalVBO);
+    VBOArray.push_back(vertexVBO);
+    VBOArray.push_back(textureVBO);
+    VBOArray.push_back(normalVBO);
+
+    // Объявляем вершины треугольника
+    Vertex triangle[] = {
+        { -0.5f, -0.5f, 0.0f },
+        { +0.5f, -0.5f, 0.0f },
+        { +0.5f, +0.5f, 0.0f },
+
+        { +0.5f, +0.5f, 0.0f },
+        { -0.5f, +0.5f, 0.0f },
+        { -0.5f, -0.5f, 0.0f },
+    };
+
+    // Объявляем текстурные координаты
+    Vertex texture[] = {
+        { 0.0f, 1.0f },
+        { 1.0f, 1.0f },
+        { 1.0f, 0.0f },
+
+        { 1.0f, 0.0f },
+        { 0.0f, 0.0f },
+        { 0.0f, 1.0f  },
+    };
+
+    Vertex normal[] = {
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f },
+    };
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(texture), texture, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(normal), normal, GL_STATIC_DRAW);
+
+    checkOpenGLerror();
+
+    // Добавляем три одинаковых объект, менять им расположение мы будем потом при обработке каждого кадра
+    for (int i = 0; i < roadCount; ++i)
+    {
+        const string filename = "model/road.png";
+        textureData.loadFromFile(filename);
+        gameObjects.push_back(GameObject{
+                6,  // количество вершин в каждом буфере
+                vertexVBO,
+                textureVBO,
+                normalVBO,
+                textureData.getNativeHandle(), {0, -2.5f + 1.0f * i} });
+
+        textureDataVector.push_back(textureData);
+    }
+
 }
 
 int InitVBO(figure_model & fm, GLuint &vertexVBO, GLuint &textureVBO, GLuint &normalVBO)
@@ -280,9 +282,9 @@ void InitGrass()
             normalVBO,
             textureData.getNativeHandle(),
             {1.0f, 1.0f},
-            {-1.54, -0.2f, -0.17},
+            {-1.56, -0.15f, -0.17},
             { 1.0f, 1.0f, 1.0f },
-            { 1.02f, 0.26f, 19.9f }
+            { 0.0f, 0.0f, 19.0f }
             
         }
     ); 
