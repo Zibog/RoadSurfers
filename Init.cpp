@@ -86,44 +86,44 @@ void InitShader() {
     shaderInformation.unifShift = glGetUniformLocation(shaderInformation.shaderProgram, "shift");
     if (shaderInformation.unifShift == -1)
     {
-        std::cout << "could not bind uniform angle" << std::endl;
+        std::cout << "could not bind unifShift " << std::endl;
         return;
     }
 
     shaderInformation.rotation = glGetUniformLocation(shaderInformation.shaderProgram, "rotation");
     if (shaderInformation.rotation == -1)
     {
-        std::cout << "could not bind uniform bus angle" << std::endl;
+        std::cout << "could not bind rotation" << std::endl;
         return;
     }
 
     shaderInformation.scaling = glGetUniformLocation(shaderInformation.shaderProgram, "scaling");
     if (shaderInformation.scaling == -1)
     {
-        std::cout << "could not bind uniform bus angle" << std::endl;
+        std::cout << "could not bind scaling" << std::endl;
         return;
     }
 
     shaderInformation.translation = glGetUniformLocation(shaderInformation.shaderProgram, "translation");
     if (shaderInformation.translation == -1)
     {
-        std::cout << "could not bind uniform bus angle" << std::endl;
+        std::cout << "could not bind translation" << std::endl;
         return;
     }
 
-    const char* unif_name = "lightPos";
-    shaderInformation.lightPosition = glGetUniformLocation(shaderInformation.shaderProgram, unif_name);
+  
+    shaderInformation.lightPosition = glGetUniformLocation(shaderInformation.shaderProgram, "lightPos");
     if (shaderInformation.lightPosition == -1)
     {
-        std::cout << "could not bind uniform " << unif_name << std::endl;
+        std::cout << "could not bind lightPosition "<< std::endl;
         return;
     }
 
-    unif_name = "eyePos";
-    shaderInformation.eyePosition = glGetUniformLocation(shaderInformation.shaderProgram, unif_name);
+
+    shaderInformation.eyePosition = glGetUniformLocation(shaderInformation.shaderProgram, "eyePos");
     if (shaderInformation.eyePosition == -1)
     {
-        std::cout << "could not bind uniform " << unif_name << std::endl;
+        std::cout << "could not bind eyePosition  " << std::endl;
         return;
     }
 
@@ -284,7 +284,7 @@ void InitGrass()
             {1.0f, 1.0f},
             {-1.56, -0.15f, -0.17},
             { 1.0f, 1.0f, 1.0f },
-            { 0.0f, 0.0f, 19.0f }
+            { 0.0f, 0.0f, 19.f }
             
         }
     ); 
@@ -340,9 +340,9 @@ void InitBox(int ind)
             textureVBO,
             normalVBO,
             textureData.getNativeHandle(),
-            {1.0f + r * 4.5f, (ind + 1) * 10.0f+30.0f},
+            {1.0f + r * 4.5f, (ind + 1) * 10.0f+5.0f},
             {-1.6, 0.0f, 3.0},//-0.005 -2.36499 0.9
-            { 0.08f, 0.08f, 0.08f },
+            { 0.06f, 0.08f, 0.02f },
             { 0.0f, -2.365f, 0.9f }
         }
     );

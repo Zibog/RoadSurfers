@@ -4,11 +4,11 @@ void turnLeft();
 
 void turnRight();
 
-void decLightPos(int axis);
+void decreaseLightPosition(int axis);
 
-void incLightPos(int axis);
+void increaseLightPosition(int axis);
 
-void decAxis(int axis);
+void decreseShift(int axis);
 
 void moveLeft();
 
@@ -16,11 +16,11 @@ void moveRight();
 
 void makeMovement();
 
-void incAxis(int axis);
+void increaseShift(int axis);
 
-void decRotateAxis(int axis);
+void decreaseRotate(int axis);
 
-void incRotateAxis(int axis);
+void increaseRotate(int axis);
 
 
 

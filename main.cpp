@@ -286,8 +286,8 @@ int main() {
                 case (sf::Keyboard::Right):
                     moveRight();
                     break;
-                case (sf::Keyboard::Up):  incAxis(1); break;
-                case (sf::Keyboard::Down):  decAxis(1); break;
+                case (sf::Keyboard::Up):  increaseShift(1); break;
+                case (sf::Keyboard::Down):  decreseShift(1); break;
                 case (sf::Keyboard::L):  lightOnGlobal = !lightOnGlobal; break;
                 default: break;
                 }
