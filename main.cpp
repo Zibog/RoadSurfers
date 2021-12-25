@@ -8,32 +8,150 @@
 #include <iostream>
 #include <ctime>
 #include <vector>
-
-#include "ShadeStructs.h"
-#include "Control.h"
 #include "Helpers.h"
-#include "Initialization.h"
-#include "Parser.h"
+#include "Init.h"
+#include "ShaderData.h"
+#include "Control.h"
+
+#define TO_STRING(x) #x
+
+const char* VertexShaderSource = TO_STRING(
+    \#version 330 core\n
+
+    uniform struct Transform {
+    mat4 viewProjection;
+} transform;
+
+uniform vec2 shift;
+uniform vec3 rotation;
+uniform vec3 scaling;
+uniform vec3 translation;
+uniform vec3 lightPos;
+uniform vec3 eyePos;
+uniform bool lightFlag;
+
+in vec3 vertCoord;
+in vec3 texureCoord;
+in vec3 normalCoord;
+
+out vec2 tCoord;
+out vec3 viewNormal;
+out vec3 lightDir;
+out vec3 viewDir;
+
+void main() {
+    float x_angle = rotation.x;
+    float y_angle = rotation.y;
+    float z_angle = rotation.z;
+
+    mat3 rotateMatrix = mat3(
+        1, 0, 0,
+        0, cos(x_angle), -sin(x_angle),
+        0, sin(x_angle), cos(x_angle)
+    ) * mat3(
+        cos(y_angle), 0, sin(y_angle),
+        0, 1, 0,
+        -sin(y_angle), 0, cos(y_angle)
+    ) * mat3(
+        cos(z_angle), -sin(z_angle), 0,
+        sin(z_angle), cos(z_angle), 0,
+        0, 0, 1
+    );
+
+    vec3 position = vertCoord * rotateMatrix;
+    viewNormal = mat3(transpose(inverse(rotateMatrix))) * normalCoord;
+    lightDir = lightPos - position;
+    viewDir = eyePos - position;
+    tCoord = vec2(texureCoord.x, texureCoord.y);
+
+    mat4 scaleMatr = mat4(
+        scaling.x, 0, 0, 0,
+        0, scaling.y, 0, 0,
+        0, 0, scaling.z, 0,
+        0, 0, 0, 1
+    );
+
+    mat4 translateMatr = mat4(
+        1, 0, 0, translation.x,
+        0, 1, 0, translation.y,
+        0, 0, 1, translation.z,
+        0, 0, 0, 1
+    );
+
+    mat4 shiftMatr = mat4(
+        1, 0, 0, shift.x,
+        0, 1, 0, shift.y,
+        0, 0, 1, 1,
+        0, 0, 0, 1
+    );
+
+    vec4 position2 = vec4(position, 1.0) * shiftMatr * scaleMatr * translateMatr;
+    // TODO: remove lightPos and eyePos;
+    gl_Position = vec4(normalCoord, 1.0f);
+    if (lightFlag) { gl_Position = vec4(normalCoord, 1.0f); }
+    gl_Position = transform.viewProjection * position2;
+}
+);
+
+const char* FragShaderSource = TO_STRING(
+    \#version 330 core\n
+
+    uniform sampler2D textureData;
+uniform bool lightFlag;
+in vec2 tCoord;
+in vec3 viewNormal;
+in vec3 lightDir;
+in vec3 viewDir;
+out vec4 color;
+
+
+const float specPower = 30.0f;
+const vec4 specColor = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+const vec4 diffColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
+
+
+
+
+void main() {
+    vec3 nviewNormal = normalize(viewNormal);
+    vec3 nlightDir = normalize(lightDir);
+
+    vec3 nviewDir = normalize(viewDir);
+    vec3 r = reflect(-nlightDir, nviewDir);
+    vec4 diff = diffColor * max(dot(nviewNormal, nlightDir), 0.0f);
+    vec4 spec = specColor * pow(max(dot(nlightDir, r), 0.0f), specPower);
+
+    color = texture(textureData, tCoord) + (diff + spec);
+    if (lightFlag) {
+        color = texture(textureData, tCoord) + (diff + spec);
+    }
+    else {
+        color = texture(textureData, tCoord) + (diff + spec) * 0;
+    }
+}
+);
+
+
 
 using namespace std;
 
-float offset[3] = { 0.02, -2.74, 0.9 };
-float rotateGlob[3] = { 0.0, 0.0 ,0.0};
-float lightPos[3] = { -13.0f, 0.0f, 0.0f };
-GLboolean lightOnGlobal = true;
+float viewPosition[]{ 0, -5, 2 };
 
 sf::Texture textureData;
 vector<sf::Texture> textureDataVector;
 std::vector <GameObject> gameObjects;
 ShaderData shaderInformation;
-// Массив VBO что бы их потом удалить
+
 std::vector <GLuint> VBOArray;
 
+float lightPos[3] = { -13.0f, 0.0f, 0.0f };
+float busShift[3] = { 0.02, -2.74, 0.9 };
+float busRotate[3] = { 0.0, 0.0 ,0.0 };
+GLboolean lightOnGlobal = true;
+
+
+
 int roadCount = 50;
-
-float view_pos[]{ 0, -5, 2 };
-
-
 
 
 
@@ -183,12 +301,15 @@ int main() {
         // Отрисовываем все объекты сцены
         for (GameObject& object : gameObjects)
         {
-            gameObjects[roadCount ].translation[0] = offset[0];
-            gameObjects[roadCount ].translation[1] = offset[1];
-            gameObjects[roadCount ].translation[2] = offset[2];
-            gameObjects[roadCount ].rotation[0] = rotateGlob[0];
-            gameObjects[roadCount ].rotation[1] = rotateGlob[1];
-            gameObjects[roadCount ].rotation[2] = rotateGlob[2];
+            gameObjects[roadCount].rotation[0] = busRotate[0];
+            gameObjects[roadCount].rotation[1] = busRotate[1];
+            gameObjects[roadCount].rotation[2] = busRotate[2];
+
+
+            gameObjects[roadCount ].translation[0] = busShift[0];
+            gameObjects[roadCount ].translation[1] = busShift[1];
+            gameObjects[roadCount ].translation[2] = busShift[2];
+           
 
             object.lightOn = lightOnGlobal;
             Draw(object, i++);

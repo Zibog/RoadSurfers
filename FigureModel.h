@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include "ShadeStructs.h"
+#include "ShaderData.h"
 
 
 

@@ -21,13 +21,10 @@
     <ClCompile Include="Control.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Initialization.cpp">
+    <ClCompile Include="Initi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Helpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,7 +32,7 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ShadeStructs.h">
+    <ClInclude Include="ShaderData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Control.h">
@@ -44,7 +41,7 @@
     <ClInclude Include="Helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Initialization.h">
+    <ClInclude Include="Init.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FigureModel.h">

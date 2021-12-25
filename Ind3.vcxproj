@@ -21,9 +21,8 @@
   <ItemGroup>
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="Helpers.cpp" />
-    <ClCompile Include="Initialization.cpp" />
+    <ClCompile Include="Initi.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Shaders.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -33,9 +32,9 @@
     <ClInclude Include="Control.h" />
     <ClInclude Include="FigureModel.h" />
     <ClInclude Include="Helpers.h" />
-    <ClInclude Include="Initialization.h" />
+    <ClInclude Include="Init.h" />
     <ClInclude Include="TextureData.h" />
-    <ClInclude Include="ShadeStructs.h" />
+    <ClInclude Include="ShaderData.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

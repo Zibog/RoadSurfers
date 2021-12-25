@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
-#include "ShadeStructs.h"
+#include "ShaderData.h"
 #include "Helpers.h"
 #include "Parser.h"
 #include "FigureModel.h"
@@ -17,7 +17,7 @@ extern ShaderData shaderInformation;
 // Массив VBO что бы их потом удалить
 extern std::vector <GLuint> VBOArray;
 extern int  roadCount;
-extern float rotateGlob[3];
+extern float busRotate[3];
 
 extern const char* VertexShaderSource;
 extern const char* FragShaderSource;
@@ -216,8 +216,8 @@ int InitVBO(figure_model & fm, GLuint &vertexVBO, GLuint &textureVBO, GLuint &no
     VBOArray.push_back(vertexVBO);
     VBOArray.push_back(textureVBO);
     VBOArray.push_back(normalVBO);
-    rotateGlob[0] = -1.66;
-    rotateGlob[2] = 3.14;
+    busRotate[0] = -1.66;
+    busRotate[2] = 3.14;
     size_t size = fm.count();
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);

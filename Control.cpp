@@ -2,32 +2,32 @@
 
 using namespace std;
 
-extern float offset[3];
-extern float rotateGlob[3];
+extern float busShift[3];
+extern float busRotate[3];
 extern float lightPos[3];
 
 
 void decAxis(int axis)//0x 1y 2z
 {
-    offset[axis] -= 0.01;
+    busShift[axis] -= 0.01;
     cout << "inc " << axis << endl;
-    cout << offset[0] << " " << offset[1] << " " << offset[2] << endl;
+    cout << busShift[0] << " " << busShift[1] << " " << busShift[2] << endl;
 }
 void incAxis(int axis)//0x 1y 2z
 {
-    offset[axis] += 0.01;
+    busShift[axis] += 0.01;
     cout << "dec " << axis << endl;
-    cout << offset[0] << " " << offset[1] << " " << offset[2] << endl;
+    cout << busShift[0] << " " << busShift[1] << " " << busShift[2] << endl;
 }
 void decRotateAxis(int axis)//0x 1y 2z
 {
-    rotateGlob[axis] += 0.01;
-    cout << rotateGlob[0] << " " << rotateGlob[1] << " " << rotateGlob[2] << endl;
+    busRotate[axis] += 0.01;
+    cout << busRotate[0] << " " << busRotate[1] << " " << busRotate[2] << endl;
 }
 void incRotateAxis(int axis)//0x 1y 2z
 {
-    rotateGlob[axis] -= 0.01;
-    cout << rotateGlob[0] << " " << rotateGlob[1] << " " << rotateGlob[2] << endl;
+    busRotate[axis] -= 0.01;
+    cout << busRotate[0] << " " << busRotate[1] << " " << busRotate[2] << endl;
 }
 
 void turnLeft() {
@@ -62,7 +62,7 @@ void makeMovement() {
     {
         if (position == 0)
         {
-            if (offset[0] < 0.3)
+            if (busShift[0] < 0.3)
             {
                 turnLeft();
             }
@@ -75,7 +75,7 @@ void makeMovement() {
         }
         else if (position == 1)
         {
-            if (offset[0] < 0.0)
+            if (busShift[0] < 0.0)
             {
                 turnLeft();
             }
@@ -91,7 +91,7 @@ void makeMovement() {
     {
         if (position == 0)
         {
-            if (offset[0] > -0.3)
+            if (busShift[0] > -0.3)
             {
                 turnRight();
             }
@@ -104,7 +104,7 @@ void makeMovement() {
         }
         else if (position == -1)
         {
-            if (offset[0] > 0.0)
+            if (busShift[0] > 0.0)
             {
                 turnRight();
             }
@@ -118,7 +118,7 @@ void makeMovement() {
     }
     if (leftAlign)
     {
-        if (rotateGlob[2] < 3.14) {
+        if (busRotate[2] < 3.14) {
             decRotateAxis(2);
         }
         else
@@ -128,7 +128,7 @@ void makeMovement() {
     }
     else  if (rightAlign)
     {
-        if (rotateGlob[2] > 3.14) {
+        if (busRotate[2] > 3.14) {
             incRotateAxis(2);
         }
         else
